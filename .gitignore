@@ -46,3 +46,8 @@ bld
 /src/Dtw/*.bak
 /inc/*.bak
 /src/AudioFileIO/*.bak
+/3rdparty/sndlib/autom4te.cache/output.0
+/3rdparty/sndlib/autom4te.cache/output.1
+/3rdparty/sndlib/autom4te.cache/requests
+/3rdparty/sndlib/autom4te.cache/traces.0
+/3rdparty/sndlib/autom4te.cache/traces.1
