@@ -76,11 +76,15 @@ int main(int argc, char* argv[])
     // get audio data and write it to the output text file (one column per channel)
     while (!phAudioFile->isEof())
     {
+        // set block length variable
         long long iNumFrames = kBlockSize;
+
+        // read data (iNumOfFrames might be updated!)
         phAudioFile->readData(ppfAudioData, iNumFrames);
 
         cout << "\r" << "reading and writing";
 
+        // write
         for (int i = 0; i < iNumFrames; i++)
         {
             for (int c = 0; c < stFileSpec.iNumChannels; c++)
