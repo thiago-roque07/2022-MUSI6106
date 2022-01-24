@@ -51,6 +51,7 @@ int main(int argc, char* argv[])
     if (!phAudioFile->isOpen())
     {
         cout << "Wave file open error!";
+        CAudioFileIf::destroy(phAudioFile);
         return -1;
     }
     phAudioFile->getFileSpec(stFileSpec);
@@ -61,6 +62,7 @@ int main(int argc, char* argv[])
     if (!hOutputFile.is_open())
     {
         cout << "Text file open error!";
+        CAudioFileIf::destroy(phAudioFile);
         return -1;
     }
 
@@ -69,6 +71,19 @@ int main(int argc, char* argv[])
     ppfAudioData = new float*[stFileSpec.iNumChannels];
     for (int i = 0; i < stFileSpec.iNumChannels; i++)
         ppfAudioData[i] = new float[kBlockSize];
+
+    if (ppfAudioData == 0)
+    {
+        CAudioFileIf::destroy(phAudioFile);
+        hOutputFile.close();
+        return -1;
+    }
+    if (ppfAudioData[0] == 0)
+    {
+        CAudioFileIf::destroy(phAudioFile);
+        hOutputFile.close();
+        return -1;
+    }
 
     time = clock();
 
