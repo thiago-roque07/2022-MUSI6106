@@ -4,7 +4,7 @@
 
 #include "MUSI6106Config.h"
 
-#include "AudioFileIf.h"
+#include "RingBuffer.h"
 
 using std::cout;
 using std::endl;
@@ -16,38 +16,25 @@ void    showClInfo ();
 // main function
 int main(int argc, char* argv[])
 {
-    std::string             sInputFilePath,                 //!< file paths
-                            sOutputFilePath;
-
-    static const int        kBlockSize = 1024;
-
-    clock_t                 time = 0;
-
-    float                   **ppfAudioData = 0;
-
-    CAudioFileIf            *phAudioFile = 0;
-    std::fstream            hOutputFile;
-    CAudioFileIf::FileSpec_t stFileSpec;
+    CRingBuffer<float>* pCRingBuff = 0; 
+    
+    static const int kBlockSize = 17;
 
     showClInfo();
 
-    //////////////////////////////////////////////////////////////////////////////
-    // parse command line arguments
- 
-    //////////////////////////////////////////////////////////////////////////////
-    // open the input wave file
- 
-    //////////////////////////////////////////////////////////////////////////////
-    // open the output text file
- 
-    //////////////////////////////////////////////////////////////////////////////
-    // allocate memory
- 
-    //////////////////////////////////////////////////////////////////////////////
-    // get audio data and write it to the output text file (one column per channel)
+    pCRingBuff = new CRingBuffer<float>(kBlockSize);
 
-    //////////////////////////////////////////////////////////////////////////////
-    // clean-up (close files and free memory)
+    for (int i = 0; i < 5; i++)
+    {
+        pCRingBuff->putPostInc(1.F*i);
+    }
+
+    for (int i = 5; i < 30; i++)
+    {
+        pCRingBuff->getNumValuesInBuffer(); // should be five
+        pCRingBuff->getPostInc(); // should be i-5
+        pCRingBuff->putPostInc(1.F*i);
+    }
 
     // all done
     return 0;
@@ -63,4 +50,3 @@ void     showClInfo()
 
     return;
 }
-
