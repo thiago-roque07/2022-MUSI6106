@@ -5,6 +5,7 @@
 #include "MUSI6106Config.h"
 
 #include "AudioFileIf.h"
+#include "CombFilterIf.h"
 
 using std::cout;
 using std::endl;
@@ -16,17 +17,17 @@ void    showClInfo ();
 // main function
 int main(int argc, char* argv[])
 {
-    std::string             sInputFilePath,                 //!< file paths
-                            sOutputFilePath;
+    std::string sInputFilePath,                 //!< file paths
+                sOutputFilePath;
 
-    static const int        kBlockSize = 1024;
+    static const int kBlockSize = 1024;
 
-    clock_t                 time = 0;
+    clock_t time = 0;
 
-    float                   **ppfAudioData = 0;
+    float **ppfAudioData = 0;
 
-    CAudioFileIf            *phAudioFile = 0;
-    std::fstream            hOutputFile;
+    CAudioFileIf *phAudioFile = 0;
+    std::fstream hOutputFile;
     CAudioFileIf::FileSpec_t stFileSpec;
 
     showClInfo();
