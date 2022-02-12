@@ -54,4 +54,9 @@ bld
 /cmake.modules/*.bak
 
 *.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
 *.sln
+*.vs
+/CMakeFiles
+/x64
