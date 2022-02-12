@@ -59,5 +59,9 @@ bld
 *.sln
 *.vs
 cmake_install.cmake
+CMakeCache.txt
 /CMakeFiles
 /x64
+/AudioFileIO
+/CombFilter
+/MUSI6106Exec
