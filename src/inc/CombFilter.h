@@ -43,12 +43,13 @@ protected:
 
     float ParamGain;         //!< gain as factor (usually -1...1)
     float ParamDelay;        //!< delay in SAMPLES for specification of comb width
-    
-    
 
+    
+ 
 private:
     CCombFilterBase(const CCombFilterBase& that);
 	
+
 };
 
 class FilterIIR : public CCombFilterBase

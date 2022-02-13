@@ -8,7 +8,9 @@
 
 /*! \brief implement a circular buffer of type T
 */
+
 template <class T> 
+
 class CRingBuffer
 {
 public:
@@ -21,7 +23,7 @@ public:
 
 
         ringbuff = new T[iBufferLengthInSamples];
-        
+
     }
 
     virtual ~CRingBuffer()
@@ -34,7 +36,9 @@ public:
     \param tNewValue the new value
     \return void
     */
-    void putPostInc (T tNewValue)
+
+    void putPostInc(T tNewValue)
+
     {
         if (CRingBuffer::writeIdx >= CRingBuffer::m_iBuffLength) {
             CRingBuffer::writeIdx = 0;
@@ -56,7 +60,7 @@ public:
 
         return;
     }
-    
+
     /*! return the value at the current read index and increment the read pointer
     \return float the value from the read index
     */
@@ -174,6 +178,6 @@ private:
     int writeIdx = 0;
     bool lastCommandPut = false;
     
-
 };
 #endif // __RingBuffer_hdr__
+
