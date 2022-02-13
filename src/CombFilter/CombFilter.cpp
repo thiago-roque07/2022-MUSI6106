@@ -15,7 +15,7 @@ CCombFilterBase::CCombFilterBase(int iBufferLengthInSamples, int iNumChannels) :
     ParamGain(0),
     ParamDelay(0),
     m_iBuffLength(0),
-    isInitialized(0)
+    isInitialized(false)
 {
     assert(iBufferLengthInSamples > 0);
     assert(iNumChannels > 0);
@@ -57,55 +57,34 @@ float CCombFilterBase::getDelay()
     return ParamDelay;
 }
 
-
-//Error_t CCombFilterBase::process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames)
-//{
-//    return Error_t();
-//}
-
-//FilterFIR::~FilterFIR()
-//{
-//}
-//
-//FilterIIR::~FilterIIR()
-//{
-//}
-
 Error_t FilterIIR::process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames)
 {
-    if (isInitialized)
-    {
-        float coeff = ParamGain;
+    float coeff = ParamGain;
 
-        for (int nChan = 0; nChan < m_iNumChannels; nChan++)
+    for (int nChan = 0; nChan < m_iNumChannels; nChan++)
+    {
+        for (int i = 0; i < iNumberOfFrames; i++)
         {
-            for (int i = 0; i < iNumberOfFrames; i++)
-            {
-                ppfOutputBuffer[nChan][i] = ppfInputBuffer[nChan][i] + coeff * m_ppCRingBuffer[nChan]->getPostInc();
-                m_ppCRingBuffer[nChan]->putPostInc(ppfOutputBuffer[nChan][i]);
-            }
+            ppfOutputBuffer[nChan][i] = ppfInputBuffer[nChan][i] + coeff * m_ppCRingBuffer[nChan]->getPostInc();
+            m_ppCRingBuffer[nChan]->putPostInc(ppfOutputBuffer[nChan][i]);
         }
-        return Error_t::kNoError;
     }
-    else return Error_t::kNotInitializedError;
-    
+    return Error_t::kNoError;
 }
 
 Error_t FilterFIR::process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames)
 {
-    if (isInitialized)
-    {
-        float coeff = ParamGain;
 
-        for (int nChan = 0; nChan < m_iNumChannels; nChan++)
+    float coeff = ParamGain;
+
+    for (int nChan = 0; nChan < m_iNumChannels; nChan++)
+    {
+        for (int i = 0; i < iNumberOfFrames; i++)
         {
-            for (int i = 0; i < iNumberOfFrames; i++)
-            {
-                ppfOutputBuffer[nChan][i] = ppfInputBuffer[nChan][i] + coeff * m_ppCRingBuffer[nChan]->getPostInc();
-                m_ppCRingBuffer[nChan]->putPostInc(ppfInputBuffer[nChan][i]);
-            }
+            ppfOutputBuffer[nChan][i] = ppfInputBuffer[nChan][i] + coeff * m_ppCRingBuffer[nChan]->getPostInc();
+            m_ppCRingBuffer[nChan]->putPostInc(ppfInputBuffer[nChan][i]);
         }
-        return Error_t::kNoError;
     }
-    else return Error_t::kNotInitializedError;
+    return Error_t::kNoError;
+
 }

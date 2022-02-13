@@ -94,8 +94,11 @@ Error_t CCombFilterIf::reset ()
 
 Error_t CCombFilterIf::process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames)
 {
-    m_pCCombFilter->process(ppfInputBuffer, ppfOutputBuffer, iNumberOfFrames);
-    return Error_t::kNoError;
+    if (m_bIsInitialized) {
+        m_pCCombFilter->process(ppfInputBuffer, ppfOutputBuffer, iNumberOfFrames);
+        return Error_t::kNoError;
+    }
+    else return Error_t::kNotInitializedError;
 }
 
 Error_t CCombFilterIf::setParam (FilterParam_t eParam, float fParamValue)
