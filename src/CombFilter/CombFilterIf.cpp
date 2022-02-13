@@ -8,6 +8,7 @@
 #include "Util.h"
 
 #include "CombFilterIf.h"
+#include "CombFilter.h"
 
 static const char*  kCMyProjectBuildDate = __DATE__;
 
@@ -56,16 +57,33 @@ const char*  CCombFilterIf::getBuildDate ()
 
 Error_t CCombFilterIf::create (CCombFilterIf*& pCCombFilter)
 {
+    pCCombFilter = new CCombFilterIf();
     return Error_t::kNoError;
 }
 
 Error_t CCombFilterIf::destroy (CCombFilterIf*& pCCombFilter)
 {
+    pCCombFilter->reset();
+    delete pCCombFilter;
+    pCCombFilter = 0;
+
     return Error_t::kNoError;
 }
 
 Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels)
 {
+    if (eFilterType == kCombFIR)
+    {
+//        m_pCCombFilter = 
+    }
+    else if (eFilterType == kCombIIR)
+    {
+//        m_pCCombFilter = 
+    }
+
+    m_fSampleRate = fSampleRateInHz;
+    m_bIsInitialized = true;
+
     return Error_t::kNoError;
 }
 

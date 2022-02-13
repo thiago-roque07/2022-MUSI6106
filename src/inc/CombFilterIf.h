@@ -2,6 +2,7 @@
 #define __CombFilterIf_hdr__
 
 #include "ErrorDef.h"
+#include "CombFilter.h"
 
 class CCombFilterBase; // in case you intend to add an internal base class that the user doesn't see (not required)
 
