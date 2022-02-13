@@ -13,16 +13,17 @@ public:
 
     Error_t setParam(CCombFilterIf::FilterParam_t eParam, float fParamValue);
     float   getParam(CCombFilterIf::FilterParam_t eParam) const;
+
     virtual Error_t process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames) = 0;
 
 protected:
     CRingBuffer<float>** m_ppCRingBuffer;
 
-    int m_iBuffLength;              //!< length of the internal buffer
+    int m_iBuffLength;              //!< MAX length of the internal buffer
     int m_iNumChannels;
 
     float ParamGain;         //!< gain as factor (usually -1...1)
-    float ParamDelay;        //!< delay in seconds for specification of comb width
+    float ParamDelay;        //!< delay in SAMPLES for specification of comb width
     
     
 
