@@ -30,6 +30,9 @@ int main(int argc, char* argv[])
     std::fstream hOutputFile;
     CAudioFileIf::FileSpec_t stFileSpec;
 
+    CCombFilterIf* pComb = 0;
+    CCombFilterIf::create(pComb);
+
     showClInfo();
 
     //////////////////////////////////////////////////////////////////////////////

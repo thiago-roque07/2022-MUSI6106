@@ -74,11 +74,11 @@ Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLength
 {
     if (eFilterType == kCombFIR)
     {
-//        m_pCCombFilter = 
+        m_pCCombFilter = static_cast<CCombFilterBase*> (new FilterFIR(CUtil::float2int<int>(fMaxDelayLengthInS * fSampleRateInHz), iNumChannels));
     }
     else if (eFilterType == kCombIIR)
     {
-//        m_pCCombFilter = 
+        m_pCCombFilter = static_cast<CCombFilterBase*> (new FilterIIR(CUtil::float2int<int>(fMaxDelayLengthInS * fSampleRateInHz), iNumChannels));
     }
 
     m_fSampleRate = fSampleRateInHz;
