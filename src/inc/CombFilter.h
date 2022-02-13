@@ -9,29 +9,14 @@ class CCombFilterBase
 {
 public:
 
-    /*! feedforward or recursive comb filter */
-    enum BaseCombFilterType_t
-    {
-        kCombFIR,           //!< finite impulse response filter
-        kCombIIR,           //!< infinite impulse response filter
-
-        kNumFilterTypes
-    };
-
-    /*! list of parameters for the comb filters */
-    enum BaseFilterParam_t
-    {
-        kParamGain,         //!< gain as factor (usually -1...1)
-        kParamDelay,        //!< delay in seconds for specification of comb width
-
-        kNumFilterParams
-    };
-
     CCombFilterBase(int iBufferLengthInSamples, int iNumChannels);
     virtual ~CCombFilterBase();
 
-    Error_t setParam(BaseFilterParam_t eParam, float fParamValue);
-    float   getParam(BaseFilterParam_t eParam);
+    Error_t setGain(float fParamValue);
+    Error_t setDelay(float fParamValue);
+
+    float   getGain();
+    float   getDelay();
 
     virtual Error_t process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames) = 0;
 
@@ -44,12 +29,10 @@ protected:
     float ParamGain;         //!< gain as factor (usually -1...1)
     float ParamDelay;        //!< delay in SAMPLES for specification of comb width
 
-    
+    bool isInitialized;
  
 private:
     CCombFilterBase(const CCombFilterBase& that);
-	
-
 };
 
 class FilterIIR : public CCombFilterBase

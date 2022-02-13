@@ -100,13 +100,32 @@ Error_t CCombFilterIf::process (float **ppfInputBuffer, float **ppfOutputBuffer,
 
 Error_t CCombFilterIf::setParam (FilterParam_t eParam, float fParamValue)
 {
+    switch (eParam)
+    {
+    case CCombFilterIf::kParamGain:
+        m_pCCombFilter->setGain(fParamValue);
+        break;
 
-    m_pCCombFilter->setParam(eParam, fParamValue);
+    case CCombFilterIf::kParamDelay:
+
+        m_pCCombFilter->setDelay(fParamValue * m_fSampleRate);
+        break;
+    }
 
     return Error_t::kNoError;
 }
 
 float CCombFilterIf::getParam (FilterParam_t eParam) const
 {
-    return m_pCCombFilter->getParam(eParam);
+    switch (eParam)
+    {
+    case CCombFilterIf::kParamGain:
+        return m_pCCombFilter->getGain();
+        break;
+
+    case CCombFilterIf::kParamDelay:
+
+        return m_pCCombFilter->getDelay() / m_fSampleRate;
+        break;
+    }
 }
