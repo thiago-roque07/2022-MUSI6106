@@ -31,7 +31,7 @@ CCombFilterBase::~CCombFilterBase()
     delete[] m_ppCRingBuffer;
 }
 
-Error_t CCombFilterBase::setParam(CCombFilterIf::FilterParam_t eParam, float fParamValue)
+Error_t CCombFilterBase::setParam(BaseFilterParam_t eParam, float fParamValue)
 {
 
     switch (eParam)
@@ -58,7 +58,7 @@ Error_t CCombFilterBase::setParam(CCombFilterIf::FilterParam_t eParam, float fPa
     return Error_t();
 }
 
-float CCombFilterBase::getParam(CCombFilterIf::FilterParam_t eParam) const
+float CCombFilterBase::getParam(BaseFilterParam_t eParam)
 {
     switch (eParam)
     {
@@ -79,13 +79,13 @@ Error_t CCombFilterBase::process(float** ppfInputBuffer, float** ppfOutputBuffer
     return Error_t();
 }
 
-FilterFIR::~FilterFIR()
-{
-}
-
-FilterIIR::~FilterIIR()
-{
-}
+//FilterFIR::~FilterFIR()
+//{
+//}
+//
+//FilterIIR::~FilterIIR()
+//{
+//}
 
 Error_t FilterIIR::process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames)
 {

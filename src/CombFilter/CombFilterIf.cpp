@@ -108,6 +108,5 @@ Error_t CCombFilterIf::setParam (FilterParam_t eParam, float fParamValue)
 
 float CCombFilterIf::getParam (FilterParam_t eParam) const
 {
-    m_pCCombFilter->getParam(eParam);
-    return 0;
+    return m_pCCombFilter->getParam(eParam);
 }

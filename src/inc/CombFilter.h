@@ -2,17 +2,36 @@
 
 #include "ErrorDef.h"
 #include "RingBuffer.h"
-#include <CombFilterIf.h>
+#include "CombFilterIf.h"
 
 
 class CCombFilterBase
 {
 public:
+
+    /*! feedforward or recursive comb filter */
+    enum BaseCombFilterType_t
+    {
+        kCombFIR,           //!< finite impulse response filter
+        kCombIIR,           //!< infinite impulse response filter
+
+        kNumFilterTypes
+    };
+
+    /*! list of parameters for the comb filters */
+    enum BaseFilterParam_t
+    {
+        kParamGain,         //!< gain as factor (usually -1...1)
+        kParamDelay,        //!< delay in seconds for specification of comb width
+
+        kNumFilterParams
+    };
+
     CCombFilterBase(int iBufferLengthInSamples, int iNumChannels);
     virtual ~CCombFilterBase();
 
-    Error_t setParam(CCombFilterIf::FilterParam_t eParam, float fParamValue);
-    float   getParam(CCombFilterIf::FilterParam_t eParam) const;
+    Error_t setParam(BaseFilterParam_t eParam, float fParamValue);
+    float   getParam(BaseFilterParam_t eParam);
 
     virtual Error_t process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames) = 0;
 
@@ -36,7 +55,7 @@ class FilterIIR : public CCombFilterBase
 {
 public:
     FilterIIR(int iBufferLengthInSamples, int iNumChannels) : CCombFilterBase(iBufferLengthInSamples, iNumChannels) {};
-    virtual ~FilterIIR() {};
+    //virtual ~FilterIIR() {};
 
     Error_t process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames) override;
 
@@ -47,7 +66,7 @@ class FilterFIR : public CCombFilterBase
 {
 public:
     FilterFIR(int iBufferLengthInSamples, int iNumChannels) : CCombFilterBase(iBufferLengthInSamples, iNumChannels) {};
-    virtual ~FilterFIR() {};
+    //virtual ~FilterFIR() {};
 
     Error_t process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames) override;
 
