@@ -20,7 +20,6 @@ int main(int argc, char* argv[])
 {
     bool test = false;
 
-    cout << "Init" << endl;
     std::string sInputFilePath,                 //!< file paths
         sOutputFilePath,
         sOutputFileDelayPath,
@@ -41,7 +40,6 @@ int main(int argc, char* argv[])
     CAudioFileIf::FileSpec_t stFileSpec;
 
     CCombFilterIf* pComb = 0;
-    cout << "Init2" << endl;
     CCombFilterIf::create(pComb);
 
 
@@ -49,8 +47,9 @@ int main(int argc, char* argv[])
     CCombFilterIf::FilterParam_t gain = CCombFilterIf::FilterParam_t::kParamGain;
     CCombFilterIf::FilterParam_t delay = CCombFilterIf::FilterParam_t::kParamDelay;
     
+    FiltType = CCombFilterIf::CombFilterType_t::kCombFIR;
     float GainValue = 0.0f;
-    float DelayValueInSec = 0.001f;
+    float DelayValueInSec = 0.0001f;
     float MaxDelayInSec = 5.0f;
 
     showClInfo();
@@ -63,38 +62,40 @@ int main(int argc, char* argv[])
     }
     else if (argc < 3)
     {
-        cout << "case 1" << endl;
+        //cout << "case 1" << endl;
         sInputFilePath = argv[1];
         sOutputFilePath = sInputFilePath + ".txt";
-        sOutputFileDelayPath = sInputFilePath + "_delayed.txt";
+        sOutputFileDelayPath = sInputFilePath + "_delay.wav";
     }
     else
     {
-        cout << "case 2" << endl;
+        //cout << "case 2" << endl;
         sInputFilePath = argv[1];
         sOutputFilePath = sInputFilePath + ".txt";
-        sOutputFileDelayPath = sInputFilePath + "_delayed.txt";
+        sOutputFileDelayPath = sInputFilePath + "_delay.wav";
         sFilterType = argv[2];
         sFilterGain = argv[3];
         sFilterDelay = argv[4];
+
+        GainValue = std::stof(sFilterGain);
+        DelayValueInSec = std::stof(sFilterDelay);
     }
 
-    GainValue = std::stof(sFilterGain);
-    DelayValueInSec = std::stof(sFilterDelay);
+
     
     if (!test)
     {
-        if (sFilterType == "FIR")
-        {
-            FiltType = CCombFilterIf::CombFilterType_t::kCombFIR;
-        }
-        else if (sFilterType == "IIR")
+        if (sFilterType == "IIR")
         {
             FiltType = CCombFilterIf::CombFilterType_t::kCombIIR;
         }
+        else if (sFilterType == "FIR")
+        {
+            FiltType = CCombFilterIf::CombFilterType_t::kCombFIR;
+        }
         else
         {
-            cout << "Filter type not recognized!";
+            cout << "Filter undefined!";
             return -1;
         }
 
@@ -125,7 +126,7 @@ int main(int argc, char* argv[])
         hOutputDelayFile.open(sOutputFileDelayPath.c_str(), std::ios::out);
         if (!hOutputDelayFile.is_open())
         {
-            cout << "Text 2 file open error!";
+            cout << "Text file open error!";
             CAudioFileIf::destroy(phAudioFile);
             return -1;
         }
@@ -198,7 +199,7 @@ int main(int argc, char* argv[])
                 for (int c = 0; c < stFileSpec.iNumChannels; c++)
                 {
                     //hOutputFile << ppfAudioData[c][i] << "\t";
-                    hOutputFile << ppfAudioDelayData[c][i] << "\t";
+                    hOutputFile << ppfAudioData[c][i] << "\t";
                 }
                 hOutputFile << endl;
             }
