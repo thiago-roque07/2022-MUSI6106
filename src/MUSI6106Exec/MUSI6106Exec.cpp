@@ -25,6 +25,8 @@ int     test5();
 int main(int argc, char* argv[])
 {
     bool test = false;
+    int numOfFrames = 0;
+    long lastFrameSize = 0;
 
     std::string sInputFilePath,                 //!< file paths
         sOutputFilePath,
@@ -128,7 +130,7 @@ int main(int argc, char* argv[])
         }
 
         //////////////////////////////////////////////////////////////////////////////
-        // open the output text file for teh delayed version
+        // open the output text file for the delayed version
         hOutputDelayFile.open(sOutputFileDelayPath.c_str(), std::ios::out);
         if (!hOutputDelayFile.is_open())
         {
@@ -161,13 +163,41 @@ int main(int argc, char* argv[])
 
         time = clock();
 
+
+        //////////////////////////////////////////////////////////////////////////////
+        // get audio data and write it to the output text file (one column per channel)
+        while (!phAudioFile->isEof())
+        {
+            // set block length variable
+            long long iNumFrames = kBlockSize;
+
+            // read data (iNumOfFrames might be updated!)
+            phAudioFile->readData(ppfAudioData, iNumFrames);
+            lastFrameSize = iNumFrames;
+            numOfFrames++;
+
+            cout << "\r" << "reading and writing";
+
+            // write
+            for (int i = 0; i < iNumFrames; i++)
+            {
+                for (int c = 0; c < stFileSpec.iNumChannels; c++)
+                {
+                    hOutputFile << ppfAudioData[c][i] << "\t";
+                }
+                hOutputFile << endl;
+            }
+        }
+
+        cout << "\nreading/writing done in: \t" << (clock() - time) * 1.F / CLOCKS_PER_SEC << " seconds." << endl;
+
         //////////////////////////////////////////////////////////////////////////////
         // Initialize Comb Filter
-
+        long long combSize = ((numOfFrames - 1) * kBlockSize) + lastFrameSize;// - (DelayValueInSec / stFileSpec.fSampleRateInHz);
         pComb->init(FiltType, MaxDelayInSec, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
         pComb->setParam(gain, GainValue);
         pComb->setParam(delay, DelayValueInSec);
-        pComb->process(ppfAudioData, ppfAudioDelayData, stFileSpec.iNumChannels);
+        pComb->process(ppfAudioData, ppfAudioDelayData, combSize);
 
         //////////////////////////////////////////////////////////////////////////////
         // get delayed audio data and write it to the output text file (one column per channel)
@@ -185,33 +215,6 @@ int main(int argc, char* argv[])
             }
             hOutputDelayFile << endl;
         }
-
-
-        //////////////////////////////////////////////////////////////////////////////
-        // get audio data and write it to the output text file (one column per channel)
-        while (!phAudioFile->isEof())
-        {
-            // set block length variable
-            long long iNumFrames = kBlockSize;
-
-            // read data (iNumOfFrames might be updated!)
-            phAudioFile->readData(ppfAudioData, iNumFrames);
-
-            cout << "\r" << "reading and writing";
-
-            // write
-            for (int i = 0; i < iNumFrames; i++)
-            {
-                for (int c = 0; c < stFileSpec.iNumChannels; c++)
-                {
-                    //hOutputFile << ppfAudioData[c][i] << "\t";
-                    hOutputFile << ppfAudioData[c][i] << "\t";
-                }
-                hOutputFile << endl;
-            }
-        }
-
-        cout << "\nreading/writing done in: \t" << (clock() - time) * 1.F / CLOCKS_PER_SEC << " seconds." << endl;
 
         //////////////////////////////////////////////////////////////////////////////
         // clean-up (close files and free memory)
