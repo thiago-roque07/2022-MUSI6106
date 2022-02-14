@@ -13,6 +13,12 @@ using std::endl;
 
 // local function declarations
 void    showClInfo ();
+int     test1();
+int     test2();
+int     test3();
+int     test4();
+int     test5();
+
 
 /////////////////////////////////////////////////////////////////////////////////
 // main function
@@ -231,12 +237,115 @@ int main(int argc, char* argv[])
     {
         // Do test
         cout << "implement test here";
-        return 0;
+        int testResult = 0;
+
+        testResult = +test1();
+        testResult = +test2();
+        testResult = +test3();
+        testResult = +test4();
+        testResult = +test5();
+
+        if (!testResult)
+        {
+            cout << "No Errors";
+            return 0;
+        }
+        else
+        {
+            cout << "Test Failed" << endl;
+            cout << "Error code: " << testResult;
+            return -1;
+        }
     }
     
 
 }
 
+int test1()
+{
+    // FIR: Output is zero if input freq matches feedforward
+
+    bool PassTest = false;
+
+    CCombFilterIf::CombFilterType_t FiltType = CCombFilterIf::CombFilterType_t::kCombFIR;
+    CCombFilterIf::FilterParam_t gain = CCombFilterIf::FilterParam_t::kParamGain;
+    CCombFilterIf::FilterParam_t delay = CCombFilterIf::FilterParam_t::kParamDelay;
+
+    float GainValue = 0.0f;
+    float DelayValueInSec = 0.0001f;
+    float MaxDelayInSec = 5.0f;
+    float fSampleRateInHz = 44100;
+    int numChannel = 1;
+
+    CCombFilterIf* pComb = 0;
+    CCombFilterIf::create(pComb);
+
+    pComb->init(FiltType, MaxDelayInSec, fSampleRateInHz, 1);
+    pComb->setParam(gain, GainValue);
+    pComb->setParam(delay, DelayValueInSec);
+    // pComb->process(ppfAudioData, ppfAudioDelayData, numChannel);
+
+    if (PassTest) return 0;
+    else return 2;
+}
+
+int test2()
+{
+    // IIR: amount of magnitude increase/decrease if input freq matches feedback
+
+    bool PassTest = false;
+
+    CCombFilterIf::CombFilterType_t FiltType = CCombFilterIf::CombFilterType_t::kCombIIR;
+    CCombFilterIf::FilterParam_t gain = CCombFilterIf::FilterParam_t::kParamGain;
+    CCombFilterIf::FilterParam_t delay = CCombFilterIf::FilterParam_t::kParamDelay;
+
+    float GainValue = 0.0f;
+    float DelayValueInSec = 0.0001f;
+    float MaxDelayInSec = 5.0f;
+    float fSampleRateInHz = 44100;
+    int numChannel = 1;
+
+    CCombFilterIf* pComb = 0;
+    CCombFilterIf::create(pComb);
+
+    pComb->init(FiltType, MaxDelayInSec, fSampleRateInHz, 1);
+    pComb->setParam(gain, GainValue);
+    pComb->setParam(delay, DelayValueInSec);
+    // pComb->process(ppfAudioData, ppfAudioDelayData, numChannel);
+
+    if (PassTest) return 0;
+    else return 4;
+}
+
+int test3()
+{
+    // FIR/IIR: correct result for VARYING input block size
+
+    bool PassTest = false;
+
+    if (PassTest) return 0;
+    else return 8;
+}
+
+int test4()
+{
+    // FIR/IIR: correct processing for zero input signal
+
+    bool PassTest = false;
+
+    if (PassTest) return 0;
+    else return 16;
+}
+
+int test5()
+{
+    // One more additional MEANINGFUL test to verify your filter implementation
+
+    bool PassTest = false;
+
+    if (PassTest) return 0;
+    else return 32;
+}
 
 void     showClInfo()
 {
