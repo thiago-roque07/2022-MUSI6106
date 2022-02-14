@@ -35,10 +35,19 @@ CCombFilterBase::~CCombFilterBase()
     delete[] m_ppCRingBuffer;
 }
 
+Error_t CCombFilterBase::reset()
+{
+    for (int c = 0; c < m_iNumChannels; c++)
+    {
+        m_ppCRingBuffer[c]->reset();
+    }
+    return Error_t::kNoError;
+}
+
 Error_t CCombFilterBase::setGain(float fParamValue)
 {
     ParamGain = fParamValue;
-    return Error_t::kNoError;;
+    return Error_t::kNoError;
 }
 
 float CCombFilterBase::getGain()
@@ -49,7 +58,7 @@ float CCombFilterBase::getGain()
 Error_t CCombFilterBase::setDelay(float fParamValue)
 {
     ParamDelay = fParamValue;
-    return Error_t::kNoError;;
+    return Error_t::kNoError;
 }
 
 float CCombFilterBase::getDelay()

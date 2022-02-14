@@ -17,9 +17,13 @@ void    showClInfo ();
 // main function
 int main(int argc, char* argv[])
 {
+    cout << "Init" << endl;
     std::string sInputFilePath,                 //!< file paths
-                sOutputFilePath,
-                sOutputFileDelayPath;
+        sOutputFilePath,
+        sOutputFileDelayPath,
+        sFilterType,
+        sFilterGain,
+        sFilterDelay;
 
     static const int kBlockSize = 1024;
 
@@ -34,16 +38,17 @@ int main(int argc, char* argv[])
     CAudioFileIf::FileSpec_t stFileSpec;
 
     CCombFilterIf* pComb = 0;
+    cout << "Init2" << endl;
     CCombFilterIf::create(pComb);
+
 
     CCombFilterIf::CombFilterType_t FiltType = CCombFilterIf::CombFilterType_t::kCombFIR;
     CCombFilterIf::FilterParam_t gain = CCombFilterIf::FilterParam_t::kParamGain;
     CCombFilterIf::FilterParam_t delay = CCombFilterIf::FilterParam_t::kParamDelay;
     
-    float GainValue = 0.5;
-    float DelayValueInSec = 0.5;
-
-    float MaxDelayInSec = 5;
+    float GainValue = 0.0f;
+    float DelayValueInSec = 0.001f;
+    float MaxDelayInSec = 5.0f;
 
     showClInfo();
 
@@ -54,11 +59,39 @@ int main(int argc, char* argv[])
         cout << "Missing audio input path!";
         return -1;
     }
-    else
+    else if (argc < 3)
     {
+        cout << "case 1" << endl;
         sInputFilePath = argv[1];
         sOutputFilePath = sInputFilePath + ".txt";
         sOutputFileDelayPath = sInputFilePath + "_delayed.txt";
+    }
+    else
+    {
+        cout << "case 2" << endl;
+        sInputFilePath = argv[1];
+        sOutputFilePath = sInputFilePath + ".txt";
+        sOutputFileDelayPath = sInputFilePath + "_delayed.txt";
+        sFilterType = argv[2];
+        sFilterGain = argv[3];
+        sFilterDelay = argv[4];
+    }
+
+    GainValue = std::stof(sFilterGain);
+    DelayValueInSec = std::stof(sFilterDelay);
+
+    if (sFilterType == "FIR")
+    {
+        FiltType = CCombFilterIf::CombFilterType_t::kCombFIR;
+    }
+    else if (sFilterType == "IIR")
+    {
+        FiltType = CCombFilterIf::CombFilterType_t::kCombIIR;
+    }
+    else 
+    {
+        cout << "Filter type not recognized!";
+        return -1;
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -95,8 +128,12 @@ int main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////////
     // allocate memory
     ppfAudioData = new float*[stFileSpec.iNumChannels];
-    for (int i = 0; i < stFileSpec.iNumChannels; i++)
+    ppfAudioDelayData = new float* [stFileSpec.iNumChannels];
+    for (int i = 0; i < stFileSpec.iNumChannels; i++) {
         ppfAudioData[i] = new float[kBlockSize];
+        ppfAudioDelayData[i] = new float[kBlockSize];
+    }
+        
 
     if (ppfAudioData == 0)
     {
@@ -114,12 +151,6 @@ int main(int argc, char* argv[])
     time = clock();
 
     //////////////////////////////////////////////////////////////////////////////
-    // Alocate memory for delayed data
-    ppfAudioDelayData = new float* [stFileSpec.iNumChannels];
-    for (int i = 0; i < stFileSpec.iNumChannels; i++)
-        ppfAudioDelayData[i] = new float[kBlockSize];
-
-    //////////////////////////////////////////////////////////////////////////////
     // Initialize Comb Filter
 
     pComb->init(FiltType, MaxDelayInSec, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
@@ -129,15 +160,10 @@ int main(int argc, char* argv[])
 
     //////////////////////////////////////////////////////////////////////////////
     // get delayed audio data and write it to the output text file (one column per channel)
-    while (!phAudioFile->isEof())
-    {
+
         // set block length variable
         long long iNumFrames = kBlockSize;
 
-        // read data (iNumOfFrames might be updated!)
-        phAudioFile->readData(ppfAudioDelayData, iNumFrames);
-
-        cout << "\r" << "reading and writing";
 
         // write
         for (int i = 0; i < iNumFrames; i++)
@@ -148,10 +174,6 @@ int main(int argc, char* argv[])
             }
             hOutputDelayFile << endl;
         }
-    }
-
-    cout << "\nreading/writing done in: \t" << (clock() - time) * 1.F / CLOCKS_PER_SEC << " seconds." << endl;
-
 
 
     //////////////////////////////////////////////////////////////////////////////
@@ -171,7 +193,8 @@ int main(int argc, char* argv[])
         {
             for (int c = 0; c < stFileSpec.iNumChannels; c++)
             {
-                hOutputFile << ppfAudioData[c][i] << "\t";
+                //hOutputFile << ppfAudioData[c][i] << "\t";
+                hOutputFile << ppfAudioDelayData[c][i] << "\t";
             }
             hOutputFile << endl;
         }
@@ -183,11 +206,18 @@ int main(int argc, char* argv[])
     // clean-up (close files and free memory)
     CAudioFileIf::destroy(phAudioFile);
     hOutputFile.close();
+    hOutputDelayFile.close();
 
     for (int i = 0; i < stFileSpec.iNumChannels; i++)
+    {
         delete[] ppfAudioData[i];
+        delete[] ppfAudioDelayData[i];
+    }
+        
     delete[] ppfAudioData;
+    delete[] ppfAudioDelayData;
     ppfAudioData = 0;
+    ppfAudioDelayData = 0;
 
     // all done
     return 0;

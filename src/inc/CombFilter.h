@@ -14,6 +14,7 @@ public:
 
     Error_t setGain(float fParamValue);
     Error_t setDelay(float fParamValue);
+    Error_t reset();
 
     float   getGain();
     float   getDelay();
@@ -39,7 +40,6 @@ class FilterIIR : public CCombFilterBase
 {
 public:
     FilterIIR(int iBufferLengthInSamples, int iNumChannels) : CCombFilterBase(iBufferLengthInSamples, iNumChannels) {};
-    //virtual ~FilterIIR() {};
 
     Error_t process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames) override;
 
@@ -50,7 +50,6 @@ class FilterFIR : public CCombFilterBase
 {
 public:
     FilterFIR(int iBufferLengthInSamples, int iNumChannels) : CCombFilterBase(iBufferLengthInSamples, iNumChannels) {};
-    //virtual ~FilterFIR() {};
 
     Error_t process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames) override;
 

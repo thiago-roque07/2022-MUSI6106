@@ -89,6 +89,9 @@ Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLength
 
 Error_t CCombFilterIf::reset ()
 {
+    m_pCCombFilter->reset();
+    m_bIsInitialized = false;
+
     return Error_t::kNoError;
 }
 
