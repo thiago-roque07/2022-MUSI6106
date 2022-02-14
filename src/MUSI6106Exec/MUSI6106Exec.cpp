@@ -17,6 +17,8 @@ void    showClInfo ();
 // main function
 int main(int argc, char* argv[])
 {
+    bool test = false;
+
     cout << "Init" << endl;
     std::string sInputFilePath,                 //!< file paths
         sOutputFilePath,
@@ -56,8 +58,7 @@ int main(int argc, char* argv[])
     // parse command line arguments
     if (argc < 2)
     {
-        cout << "Missing audio input path!";
-        return -1;
+        test = true;
     }
     else if (argc < 3)
     {
@@ -79,89 +80,91 @@ int main(int argc, char* argv[])
 
     GainValue = std::stof(sFilterGain);
     DelayValueInSec = std::stof(sFilterDelay);
-
-    if (sFilterType == "FIR")
+    
+    if (!test)
     {
-        FiltType = CCombFilterIf::CombFilterType_t::kCombFIR;
-    }
-    else if (sFilterType == "IIR")
-    {
-        FiltType = CCombFilterIf::CombFilterType_t::kCombIIR;
-    }
-    else 
-    {
-        cout << "Filter type not recognized!";
-        return -1;
-    }
+        if (sFilterType == "FIR")
+        {
+            FiltType = CCombFilterIf::CombFilterType_t::kCombFIR;
+        }
+        else if (sFilterType == "IIR")
+        {
+            FiltType = CCombFilterIf::CombFilterType_t::kCombIIR;
+        }
+        else
+        {
+            cout << "Filter type not recognized!";
+            return -1;
+        }
 
-    //////////////////////////////////////////////////////////////////////////////
-    // open the input wave file
-    CAudioFileIf::create(phAudioFile);
-    phAudioFile->openFile(sInputFilePath, CAudioFileIf::kFileRead);
-    if (!phAudioFile->isOpen())
-    {
-        cout << "Wave file open error!";
-        CAudioFileIf::destroy(phAudioFile);
-        return -1;
-    }
-    phAudioFile->getFileSpec(stFileSpec);
+        //////////////////////////////////////////////////////////////////////////////
+        // open the input wave file
+        CAudioFileIf::create(phAudioFile);
+        phAudioFile->openFile(sInputFilePath, CAudioFileIf::kFileRead);
+        if (!phAudioFile->isOpen())
+        {
+            cout << "Wave file open error!";
+            CAudioFileIf::destroy(phAudioFile);
+            return -1;
+        }
+        phAudioFile->getFileSpec(stFileSpec);
 
-    //////////////////////////////////////////////////////////////////////////////
-    // open the output text file
-    hOutputFile.open(sOutputFilePath.c_str(), std::ios::out);
-    if (!hOutputFile.is_open())
-    {
-        cout << "Text file open error!";
-        CAudioFileIf::destroy(phAudioFile);
-        return -1;
-    }
+        //////////////////////////////////////////////////////////////////////////////
+        // open the output text file
+        hOutputFile.open(sOutputFilePath.c_str(), std::ios::out);
+        if (!hOutputFile.is_open())
+        {
+            cout << "Text file open error!";
+            CAudioFileIf::destroy(phAudioFile);
+            return -1;
+        }
 
-    //////////////////////////////////////////////////////////////////////////////
-    // open the output text file for teh delayed version
-    hOutputDelayFile.open(sOutputFileDelayPath.c_str(), std::ios::out);
-    if (!hOutputDelayFile.is_open())
-    {
-        cout << "Text 2 file open error!";
-        CAudioFileIf::destroy(phAudioFile);
-        return -1;
-    }
-    //////////////////////////////////////////////////////////////////////////////
-    // allocate memory
-    ppfAudioData = new float*[stFileSpec.iNumChannels];
-    ppfAudioDelayData = new float* [stFileSpec.iNumChannels];
-    for (int i = 0; i < stFileSpec.iNumChannels; i++) {
-        ppfAudioData[i] = new float[kBlockSize];
-        ppfAudioDelayData[i] = new float[kBlockSize];
-    }
-        
+        //////////////////////////////////////////////////////////////////////////////
+        // open the output text file for teh delayed version
+        hOutputDelayFile.open(sOutputFileDelayPath.c_str(), std::ios::out);
+        if (!hOutputDelayFile.is_open())
+        {
+            cout << "Text 2 file open error!";
+            CAudioFileIf::destroy(phAudioFile);
+            return -1;
+        }
+        //////////////////////////////////////////////////////////////////////////////
+        // allocate memory
+        ppfAudioData = new float* [stFileSpec.iNumChannels];
+        ppfAudioDelayData = new float* [stFileSpec.iNumChannels];
+        for (int i = 0; i < stFileSpec.iNumChannels; i++) {
+            ppfAudioData[i] = new float[kBlockSize];
+            ppfAudioDelayData[i] = new float[kBlockSize];
+        }
 
-    if (ppfAudioData == 0)
-    {
-        CAudioFileIf::destroy(phAudioFile);
-        hOutputFile.close();
-        return -1;
-    }
-    if (ppfAudioData[0] == 0)
-    {
-        CAudioFileIf::destroy(phAudioFile);
-        hOutputFile.close();
-        return -1;
-    }
 
-    time = clock();
+        if (ppfAudioData == 0)
+        {
+            CAudioFileIf::destroy(phAudioFile);
+            hOutputFile.close();
+            return -1;
+        }
+        if (ppfAudioData[0] == 0)
+        {
+            CAudioFileIf::destroy(phAudioFile);
+            hOutputFile.close();
+            return -1;
+        }
 
-    //////////////////////////////////////////////////////////////////////////////
-    // Initialize Comb Filter
+        time = clock();
 
-    pComb->init(FiltType, MaxDelayInSec, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
-    pComb->setParam(gain, GainValue);
-    pComb->setParam(delay, DelayValueInSec);
-    pComb->process(ppfAudioData, ppfAudioDelayData, stFileSpec.iNumChannels);
+        //////////////////////////////////////////////////////////////////////////////
+        // Initialize Comb Filter
 
-    //////////////////////////////////////////////////////////////////////////////
-    // get delayed audio data and write it to the output text file (one column per channel)
+        pComb->init(FiltType, MaxDelayInSec, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
+        pComb->setParam(gain, GainValue);
+        pComb->setParam(delay, DelayValueInSec);
+        pComb->process(ppfAudioData, ppfAudioDelayData, stFileSpec.iNumChannels);
 
-        // set block length variable
+        //////////////////////////////////////////////////////////////////////////////
+        // get delayed audio data and write it to the output text file (one column per channel)
+
+            // set block length variable
         long long iNumFrames = kBlockSize;
 
 
@@ -176,51 +179,59 @@ int main(int argc, char* argv[])
         }
 
 
-    //////////////////////////////////////////////////////////////////////////////
-    // get audio data and write it to the output text file (one column per channel)
-    while (!phAudioFile->isEof())
-    {
-        // set block length variable
-        long long iNumFrames = kBlockSize;
-
-        // read data (iNumOfFrames might be updated!)
-        phAudioFile->readData(ppfAudioData, iNumFrames);
-
-        cout << "\r" << "reading and writing";
-
-        // write
-        for (int i = 0; i < iNumFrames; i++)
+        //////////////////////////////////////////////////////////////////////////////
+        // get audio data and write it to the output text file (one column per channel)
+        while (!phAudioFile->isEof())
         {
-            for (int c = 0; c < stFileSpec.iNumChannels; c++)
+            // set block length variable
+            long long iNumFrames = kBlockSize;
+
+            // read data (iNumOfFrames might be updated!)
+            phAudioFile->readData(ppfAudioData, iNumFrames);
+
+            cout << "\r" << "reading and writing";
+
+            // write
+            for (int i = 0; i < iNumFrames; i++)
             {
-                //hOutputFile << ppfAudioData[c][i] << "\t";
-                hOutputFile << ppfAudioDelayData[c][i] << "\t";
+                for (int c = 0; c < stFileSpec.iNumChannels; c++)
+                {
+                    //hOutputFile << ppfAudioData[c][i] << "\t";
+                    hOutputFile << ppfAudioDelayData[c][i] << "\t";
+                }
+                hOutputFile << endl;
             }
-            hOutputFile << endl;
         }
+
+        cout << "\nreading/writing done in: \t" << (clock() - time) * 1.F / CLOCKS_PER_SEC << " seconds." << endl;
+
+        //////////////////////////////////////////////////////////////////////////////
+        // clean-up (close files and free memory)
+        CAudioFileIf::destroy(phAudioFile);
+        hOutputFile.close();
+        hOutputDelayFile.close();
+
+        for (int i = 0; i < stFileSpec.iNumChannels; i++)
+        {
+            delete[] ppfAudioData[i];
+            delete[] ppfAudioDelayData[i];
+        }
+
+        delete[] ppfAudioData;
+        delete[] ppfAudioDelayData;
+        ppfAudioData = 0;
+        ppfAudioDelayData = 0;
+
+        // all done
+        return 0;
     }
-
-    cout << "\nreading/writing done in: \t" << (clock() - time) * 1.F / CLOCKS_PER_SEC << " seconds." << endl;
-
-    //////////////////////////////////////////////////////////////////////////////
-    // clean-up (close files and free memory)
-    CAudioFileIf::destroy(phAudioFile);
-    hOutputFile.close();
-    hOutputDelayFile.close();
-
-    for (int i = 0; i < stFileSpec.iNumChannels; i++)
+    else
     {
-        delete[] ppfAudioData[i];
-        delete[] ppfAudioDelayData[i];
+        // Do test
+        cout << "implement test here";
+        return 0;
     }
-        
-    delete[] ppfAudioData;
-    delete[] ppfAudioDelayData;
-    ppfAudioData = 0;
-    ppfAudioDelayData = 0;
-
-    // all done
-    return 0;
+    
 
 }
 
