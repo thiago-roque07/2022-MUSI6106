@@ -72,13 +72,16 @@ Error_t CCombFilterIf::destroy (CCombFilterIf*& pCCombFilter)
 
 Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels)
 {
+
+    int iMaxDelayInSamples = int ( fMaxDelayLengthInS * fSampleRateInHz );
+
     if (eFilterType == kCombFIR)
     {
-        m_pCCombFilter = static_cast<CCombFilterBase*> (new FilterFIR(CUtil::float2int<int>(fMaxDelayLengthInS * fSampleRateInHz), iNumChannels));
+        m_pCCombFilter = static_cast<CCombFilterBase*> (new FilterFIR(iMaxDelayInSamples, iNumChannels));
     }
     else if (eFilterType == kCombIIR)
     {
-        m_pCCombFilter = static_cast<CCombFilterBase*> (new FilterIIR(CUtil::float2int<int>(fMaxDelayLengthInS * fSampleRateInHz), iNumChannels));
+        m_pCCombFilter = static_cast<CCombFilterBase*> (new FilterIIR(iMaxDelayInSamples, iNumChannels));
     }
 
     m_fSampleRate = fSampleRateInHz;
