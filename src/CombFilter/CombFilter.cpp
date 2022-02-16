@@ -95,17 +95,8 @@ Error_t FilterFIR::process(float** ppfInputBuffer, float** ppfOutputBuffer, int 
     {
         for (int i = 0; i < iNumberOfFrames; i++)
         {
-            if ((m_ppCRingBuffer[nChan]->getReadIdx() < (int)ParamDelay) && (firstRound))
-            {
-                ppfOutputBuffer[nChan][i] = 0;
-                m_ppCRingBuffer[nChan]->getPostInc();
-            }
-            else
-            {
-                firstRound = false;
                 ppfOutputBuffer[nChan][i] = ppfInputBuffer[nChan][i] + coeff * m_ppCRingBuffer[nChan]->getPostInc();
                 m_ppCRingBuffer[nChan]->putPostInc(ppfInputBuffer[nChan][i]);
-            }
 
         }
     }
