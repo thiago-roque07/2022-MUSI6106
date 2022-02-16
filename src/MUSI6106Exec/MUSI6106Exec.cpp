@@ -43,6 +43,7 @@ int main(int argc, char* argv[])
     float **ppfAudioDelayData = 0;
 
     CAudioFileIf *phAudioFile = 0;
+
     std::fstream hOutputFile;
     std::fstream hOutputDelayFile;
     CAudioFileIf::FileSpec_t stFileSpec;
@@ -58,7 +59,7 @@ int main(int argc, char* argv[])
     FiltType = CCombFilterIf::CombFilterType_t::kCombFIR;
     float GainValue = 0.0f;
     float DelayValueInSec = 0.1f;
-    float MaxDelayInSec = 0.5f;
+    float MaxDelayInSec = 5.0f;
 
     showClInfo();
 
@@ -73,7 +74,7 @@ int main(int argc, char* argv[])
         //cout << "case 1" << endl;
         sInputFilePath = argv[1];
         sOutputFilePath = sInputFilePath + ".txt";
-        sOutputFileDelayPath = sInputFilePath + "_delay.wav";
+        sOutputFileDelayPath = sInputFilePath + "_delay.txt";
 
         sFilterType = "FIR";
     }
@@ -82,7 +83,7 @@ int main(int argc, char* argv[])
         //cout << "case 2" << endl;
         sInputFilePath = argv[1];
         sOutputFilePath = sInputFilePath + ".txt";
-        sOutputFileDelayPath = sInputFilePath + "_delay.wav";
+        sOutputFileDelayPath = sInputFilePath + "_delay.txt";
         sFilterType = argv[2];
         sFilterGain = argv[3];
         sFilterDelay = argv[4];
@@ -151,21 +152,23 @@ int main(int argc, char* argv[])
         }
 
 
-        if (ppfAudioData == 0)
+        if ((ppfAudioData == 0) || (ppfAudioDelayData == 0))
         {
             CAudioFileIf::destroy(phAudioFile);
+            CCombFilterIf::destroy(pComb);
             hOutputFile.close();
-            return -1;
-        }
-        if (ppfAudioData[0] == 0)
-        {
-            CAudioFileIf::destroy(phAudioFile);
-            hOutputFile.close();
+            hOutputDelayFile.close();
             return -1;
         }
 
         time = clock();
 
+        //////////////////////////////////////////////////////////////////////////////
+        // Initialize Comb Filter
+
+        pComb->init(FiltType, MaxDelayInSec, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
+        pComb->setParam(gain, GainValue);
+        pComb->setParam(delay, DelayValueInSec);
 
         //////////////////////////////////////////////////////////////////////////////
         // get audio data and write it to the output text file (one column per channel)
@@ -176,6 +179,8 @@ int main(int argc, char* argv[])
 
             // read data (iNumOfFrames might be updated!)
             phAudioFile->readData(ppfAudioData, iNumFrames);
+            pComb->process(ppfAudioData, ppfAudioDelayData, iNumFrames);
+
             lastFrameSize = iNumFrames;
             numOfFrames++;
 
@@ -187,41 +192,21 @@ int main(int argc, char* argv[])
                 for (int c = 0; c < stFileSpec.iNumChannels; c++)
                 {
                     hOutputFile << ppfAudioData[c][i] << "\t";
+                    hOutputDelayFile << ppfAudioDelayData[c][i] << "\t";
                 }
                 hOutputFile << endl;
+                hOutputDelayFile << endl;
             }
         }
 
         cout << "\nreading/writing done in: \t" << (clock() - time) * 1.F / CLOCKS_PER_SEC << " seconds." << endl;
 
-        //////////////////////////////////////////////////////////////////////////////
-        // Initialize Comb Filter
-        long long combSize = ((numOfFrames - 100) * kBlockSize); //+ lastFrameSize;// - (DelayValueInSec / stFileSpec.fSampleRateInHz);
-        pComb->init(FiltType, MaxDelayInSec, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
-        pComb->setParam(gain, GainValue);
-        pComb->setParam(delay, DelayValueInSec);
-        pComb->process(ppfAudioData, ppfAudioDelayData, combSize);
-
-        //////////////////////////////////////////////////////////////////////////////
-        // get delayed audio data and write it to the output text file (one column per channel)
-
-            // set block length variable
-        long long iNumFrames = kBlockSize;
-
-
-        // write
-        for (int i = 0; i < iNumFrames; i++)
-        {
-            for (int c = 0; c < stFileSpec.iNumChannels; c++)
-            {
-                hOutputDelayFile << ppfAudioDelayData[c][i] << "\t";
-            }
-            hOutputDelayFile << endl;
-        }
 
         //////////////////////////////////////////////////////////////////////////////
         // clean-up (close files and free memory)
         CAudioFileIf::destroy(phAudioFile);
+        CCombFilterIf::destroy(pComb);
+
         hOutputFile.close();
         hOutputDelayFile.close();
 
@@ -346,6 +331,7 @@ int test4()
 int test5()
 {
     // One more additional MEANINGFUL test to verify your filter implementation
+    // If gain is set to ZERO, the two files should be the same
 
     bool PassTest = false;
 

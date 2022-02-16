@@ -58,6 +58,11 @@ float CCombFilterBase::getGain()
 Error_t CCombFilterBase::setDelay(float fParamValue)
 {
     ParamDelay = fParamValue;
+    for (int nChan = 0; nChan < m_iNumChannels; nChan++)
+    {
+        m_ppCRingBuffer[nChan]->setWriteIdx(ParamDelay);
+    }
+    
     return Error_t::kNoError;
 }
 
@@ -90,9 +95,17 @@ Error_t FilterFIR::process(float** ppfInputBuffer, float** ppfOutputBuffer, int 
     {
         for (int i = 0; i < iNumberOfFrames; i++)
         {
-            ppfOutputBuffer[nChan][i] = ppfInputBuffer[nChan][i] + coeff * m_ppCRingBuffer[nChan]->getPostInc();
-            m_ppCRingBuffer[nChan]->putPostInc(ppfInputBuffer[nChan][i]);
-            cout << nChan << " - " << i << endl;
+            if ((m_ppCRingBuffer[nChan]->getReadIdx() < (int)ParamDelay) && (firstRound))
+            {
+                ppfOutputBuffer[nChan][i] = 0;
+                m_ppCRingBuffer[nChan]->getPostInc();
+            }
+            else
+            {
+                firstRound = false;
+                ppfOutputBuffer[nChan][i] = ppfInputBuffer[nChan][i] + coeff * m_ppCRingBuffer[nChan]->getPostInc();
+                m_ppCRingBuffer[nChan]->putPostInc(ppfInputBuffer[nChan][i]);
+            }
 
         }
     }

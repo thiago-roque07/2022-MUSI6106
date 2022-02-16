@@ -31,6 +31,7 @@ protected:
     float ParamDelay;        //!< delay in SAMPLES for specification of comb width
 
     bool isInitialized;
+    bool firstRound;
  
 private:
     CCombFilterBase(const CCombFilterBase& that);

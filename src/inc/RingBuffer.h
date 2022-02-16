@@ -48,10 +48,6 @@ public:
     {
         //assert(m_iWriteIdx);
         m_ptBuff[m_iWriteIdx] = tNewValue;
-        counter++;
-        if (counter > 22000) {
-            cout << counter << " - " << m_iWriteIdx << endl;
-        }
     }
 
     /*! return the value at the current read index and increment the read pointer
@@ -149,8 +145,6 @@ private:
         m_iReadIdx,         //!< current read index
         m_iWriteIdx;        //!< current write index
 
-    int counter = 0;
-    int counter2 = 0;
     T* m_ptBuff;            //!< data buffer
 };
 #endif // __RingBuffer_hdr__
