@@ -60,10 +60,12 @@ public:
     }
 
     /*! return the value at the current read index
+    \param fOffset: read at offset from read index
     \return float the value from the read index
     */
-    T get() const
+    T get(float fOffset = 0) const
     {
+        assert(0); // TODO: implement offset
         return m_ptBuff[m_iReadIdx];
     }
 
@@ -140,10 +142,10 @@ private:
         iIdx = (iIdx + iOffset) % m_iBuffLength;
     };
 
-    int m_iBuffLength,      //!< length of the internal buffer
-        m_iReadIdx,         //!< current read index
-        m_iWriteIdx;        //!< current write index
+    int m_iBuffLength = 0,      //!< length of the internal buffer
+        m_iReadIdx = 0,         //!< current read index
+        m_iWriteIdx = 0;        //!< current write index
 
-    T* m_ptBuff;            //!< data buffer
+    T* m_ptBuff = 0;            //!< data buffer
 };
 #endif // __RingBuffer_hdr__
