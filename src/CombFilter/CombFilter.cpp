@@ -60,6 +60,7 @@ Error_t CCombFilterBase::setDelay(float fParamValue)
     ParamDelay = fParamValue;
     for (int nChan = 0; nChan < m_iNumChannels; nChan++)
     {
+        m_ppCRingBuffer[nChan]->reset();
         m_ppCRingBuffer[nChan]->setWriteIdx(ParamDelay);
     }
     
