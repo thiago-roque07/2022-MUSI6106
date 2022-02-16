@@ -57,8 +57,8 @@ int main(int argc, char* argv[])
     
     FiltType = CCombFilterIf::CombFilterType_t::kCombFIR;
     float GainValue = 0.0f;
-    float DelayValueInSec = 0.0001f;
-    float MaxDelayInSec = 5.0f;
+    float DelayValueInSec = 0.1f;
+    float MaxDelayInSec = 0.5f;
 
     showClInfo();
 
@@ -74,6 +74,8 @@ int main(int argc, char* argv[])
         sInputFilePath = argv[1];
         sOutputFilePath = sInputFilePath + ".txt";
         sOutputFileDelayPath = sInputFilePath + "_delay.wav";
+
+        sFilterType = "FIR";
     }
     else
     {
@@ -93,6 +95,7 @@ int main(int argc, char* argv[])
     
     if (!test)
     {
+
         if (sFilterType == "IIR")
         {
             FiltType = CCombFilterIf::CombFilterType_t::kCombIIR;
@@ -193,7 +196,7 @@ int main(int argc, char* argv[])
 
         //////////////////////////////////////////////////////////////////////////////
         // Initialize Comb Filter
-        long long combSize = ((numOfFrames - 1) * kBlockSize) + lastFrameSize;// - (DelayValueInSec / stFileSpec.fSampleRateInHz);
+        long long combSize = ((numOfFrames - 100) * kBlockSize); //+ lastFrameSize;// - (DelayValueInSec / stFileSpec.fSampleRateInHz);
         pComb->init(FiltType, MaxDelayInSec, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
         pComb->setParam(gain, GainValue);
         pComb->setParam(delay, DelayValueInSec);

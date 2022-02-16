@@ -92,6 +92,8 @@ Error_t FilterFIR::process(float** ppfInputBuffer, float** ppfOutputBuffer, int 
         {
             ppfOutputBuffer[nChan][i] = ppfInputBuffer[nChan][i] + coeff * m_ppCRingBuffer[nChan]->getPostInc();
             m_ppCRingBuffer[nChan]->putPostInc(ppfInputBuffer[nChan][i]);
+            cout << nChan << " - " << i << endl;
+
         }
     }
     return Error_t::kNoError;
