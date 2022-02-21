@@ -6,26 +6,39 @@
 % http://www.dafx.de. It may be used for educational purposes and not 
 % for commercial applications without further permission.
 %--------------------------------------------------------------------------
-filename = 'C:/Users/thiag/Documents/Git-repos/2022-MUSI6106/audio/audio_sine440.wav';
+filename = 'C:/Users/thiag/Documents/Git-repos/2022-MUSI6106/Matlab/sweep.wav';
 
 [x,Fs] = audioread(filename);
+delayInSec = 0.01;
+delayInSample = delayInSec * Fs;
+g=1;
 
-% x=zeros(100,1);x(1)=1; % unit impulse signal of length 100
-g=0.5;
-Delayline=zeros(100,1);% memory allocation for length 10
+Delayline=zeros(2*delayInSample,1);% memory allocation 
 for n=1:length(x)
-	y(n)=x(n)+g*Delayline(100);
-	Delayline=[x(n);Delayline(1:100-1)];
+	y(n)=x(n)+g*Delayline(delayInSample);
+	Delayline=[x(n);Delayline(1:delayInSample-1)];
 end
 
-FilteredFile = 'C:/Users/thiag/Documents/Git-repos/2022-MUSI6106/audio/audio_sine440.wav_delay';
-fileID = fopen(FilteredFile, 'w');
+FilteredFile = 'C:/Users/thiag/Documents/Git-repos/2022-MUSI6106/Matlab/sweep.wav_delay.txt';
+fileID = fopen(FilteredFile, 'r');
 formatSpec = '%f';
 sizeA = [2 Inf];
-A = fscanf(fileID,formatSpec, sizeA);
+A = transpose(fscanf(fileID,formatSpec, sizeA));
+A = A(:,1);
 
-diff = transpose(A(1:length(A))) - y(1:length(A));
-xAxis = 1:length(A);
+figure;
+plot(x(1:3000,1));
+figure;
+plot(y(1:3000));
+title('Matlab Implementation - FIR Comb Filter')
+figure;
+plot(A(1:3000));
+title('c++ Implementation - FIR Comb Filter')
 
-plot(diff, 'LineWidth', 1);
+B = transpose(y(1:length(A)));
+
+diff = A - B;
+
+figure;
+plot(diff(1:3000));
 title('FIR difference')

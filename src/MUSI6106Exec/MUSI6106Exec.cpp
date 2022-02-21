@@ -291,7 +291,7 @@ int test1()
     pComb->setParam(delay, DelayValueInSec);
     pComb->process(inputSine, output, Nsamples);
 
-    for (int i = 0; i < Nsamples; i++)
+    for (int i = 99; i < Nsamples; i++) // initializing loop at 99 to skip undelayed section
     {
         if (abs(output[0][i]) > 0.1)
         {
