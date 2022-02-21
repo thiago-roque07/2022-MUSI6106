@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <ctime>
+#include <math.h> 
 
 #include "MUSI6106Config.h"
 
@@ -10,6 +11,7 @@
 using std::cout;
 using std::endl;
 
+#define PI          3.141592
 
 // local function declarations
 void    showClInfo ();
@@ -67,20 +69,13 @@ int main(int argc, char* argv[])
     // parse command line arguments
     if (argc < 2)
     {
+        cout << "No input information" << endl;
+        cout << "Entering test mode" << endl;
+        cout << "..." << endl;
         test = true;
     }
-    else if (argc < 3)
+    else if (argc == 5)
     {
-        //cout << "case 1" << endl;
-        sInputFilePath = argv[1];
-        sOutputFilePath = sInputFilePath + ".txt";
-        sOutputFileDelayPath = sInputFilePath + "_delay.txt";
-
-        sFilterType = "FIR";
-    }
-    else
-    {
-        //cout << "case 2" << endl;
         sInputFilePath = argv[1];
         sOutputFilePath = sInputFilePath + ".txt";
         sOutputFileDelayPath = sInputFilePath + "_delay.txt";
@@ -90,6 +85,11 @@ int main(int argc, char* argv[])
 
         GainValue = std::stof(sFilterGain);
         DelayValueInSec = std::stof(sFilterDelay);
+    }
+    else
+    {
+        cout << "Input information not recognized" << endl;
+        cout << "Enter information as: [filePath FilterType FilterCoef FilterDelay]" << endl;
     }
 
 
@@ -227,7 +227,6 @@ int main(int argc, char* argv[])
     else
     {
         // Do test
-        cout << "implement test here";
         int testResult = 0;
 
         testResult = +test1();
@@ -256,17 +255,29 @@ int test1()
 {
     // FIR: Output is zero if input freq matches feedforward
 
-    bool PassTest = false;
+    int PassTest = 0;
+
+    int numChannel = 1;
+    float sampleRate = 44100;
+    float freq = 100;
+    float Nsamples = 0.5 * sampleRate;
+    float** inputSine = new float* [numChannel];
+    float** output = new float* [numChannel];
+    inputSine[0] = new float[Nsamples];
+    output[0] = new float[Nsamples];
 
     CCombFilterIf::CombFilterType_t FiltType = CCombFilterIf::CombFilterType_t::kCombFIR;
     CCombFilterIf::FilterParam_t gain = CCombFilterIf::FilterParam_t::kParamGain;
     CCombFilterIf::FilterParam_t delay = CCombFilterIf::FilterParam_t::kParamDelay;
 
-    float GainValue = 0.0f;
-    float DelayValueInSec = 0.0001f;
-    float MaxDelayInSec = 5.0f;
-    float fSampleRateInHz = 44100;
-    int numChannel = 1;
+    float GainValue = 1.0f;
+    float DelayValueInSec = 0.01f;
+    float MaxDelayInSec = 1.0f;
+    float fSampleRateInHz = sampleRate;
+
+    for (int i = 0; i < Nsamples; ++i) {
+        inputSine[0][i] = static_cast<float>(sin(2 * PI * freq * i / sampleRate));
+    }
 
     CCombFilterIf* pComb = 0;
     CCombFilterIf::create(pComb);
@@ -274,9 +285,26 @@ int test1()
     pComb->init(FiltType, MaxDelayInSec, fSampleRateInHz, 1);
     pComb->setParam(gain, GainValue);
     pComb->setParam(delay, DelayValueInSec);
-    // pComb->process(ppfAudioData, ppfAudioDelayData, numChannel);
+    pComb->process(inputSine, output, numChannel);
 
-    if (PassTest) return 0;
+    for (int i = 0; i < Nsamples; i++)
+    {
+        if (output[0][i] > 0.0001)
+        {
+            PassTest++;
+        }
+    }
+    cout << "test 1 result:" << PassTest << endl;
+    cout << "test 1 result has to be zero for approval" << endl << endl;
+
+    delete[] inputSine[0];
+    delete[] inputSine;
+    delete[] output[0];
+    delete[] output;
+    CCombFilterIf::destroy(pComb);
+
+
+    if (!PassTest) return 0;
     else return 2;
 }
 
@@ -284,17 +312,29 @@ int test2()
 {
     // IIR: amount of magnitude increase/decrease if input freq matches feedback
 
-    bool PassTest = false;
+    int PassTest = 0;
+
+    int numChannel = 1;
+    float sampleRate = 44100;
+    float freq = 100;
+    float Nsamples = sampleRate;
+    float** inputSine = new float* [numChannel];
+    float** output = new float* [numChannel];
+    inputSine[0] = new float[Nsamples];
+    output[0] = new float[Nsamples];
 
     CCombFilterIf::CombFilterType_t FiltType = CCombFilterIf::CombFilterType_t::kCombIIR;
     CCombFilterIf::FilterParam_t gain = CCombFilterIf::FilterParam_t::kParamGain;
     CCombFilterIf::FilterParam_t delay = CCombFilterIf::FilterParam_t::kParamDelay;
 
-    float GainValue = 0.0f;
-    float DelayValueInSec = 0.0001f;
-    float MaxDelayInSec = 5.0f;
-    float fSampleRateInHz = 44100;
-    int numChannel = 1;
+    float GainValue = 1.0f;
+    float DelayValueInSec = 0.01f;
+    float MaxDelayInSec = 1.0f;
+    float fSampleRateInHz = sampleRate;
+
+    for (int i = 0; i < Nsamples; ++i) {
+        inputSine[0][i] = static_cast<float>(sin(2 * PI * freq * i / sampleRate));
+    }
 
     CCombFilterIf* pComb = 0;
     CCombFilterIf::create(pComb);
@@ -302,7 +342,27 @@ int test2()
     pComb->init(FiltType, MaxDelayInSec, fSampleRateInHz, 1);
     pComb->setParam(gain, GainValue);
     pComb->setParam(delay, DelayValueInSec);
-    // pComb->process(ppfAudioData, ppfAudioDelayData, numChannel);
+    pComb->process(inputSine, output, numChannel);
+
+    for (int i = 0; i < 441; i++)
+    {
+        cout << output[0][i] << endl;
+        int sinePeak = i;// *100 + 25;
+        if (output[0][sinePeak] < 0.9)
+        {
+            //cout << output[0][sinePeak];
+            PassTest++;
+        }
+    }
+
+    cout << "test 2 result:" << PassTest << endl;
+    cout << "test 2 result has to be zero for approval" << endl << endl;
+
+    delete[] inputSine[0];
+    delete[] inputSine;
+    delete[] output[0];
+    delete[] output;
+    CCombFilterIf::destroy(pComb);
 
     if (PassTest) return 0;
     else return 4;
@@ -338,6 +398,7 @@ int test5()
     if (PassTest) return 0;
     else return 32;
 }
+
 
 void     showClInfo()
 {
