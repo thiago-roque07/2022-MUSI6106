@@ -51,3 +51,17 @@ bld
 /3rdparty/sndlib/autom4te.cache/requests
 /3rdparty/sndlib/autom4te.cache/traces.0
 /3rdparty/sndlib/autom4te.cache/traces.1
+/cmake.modules/*.bak
+
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.vs
+cmake_install.cmake
+CMakeCache.txt
+/CMakeFiles
+/x64
+/AudioFileIO
+/CombFilter
+/MUSI6106Exec
