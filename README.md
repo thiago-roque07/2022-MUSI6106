@@ -1,6 +1,7 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/alexanderlerch/2022-MUSI6106)
 ![GitHub issues](https://img.shields.io/github/issues-raw/alexanderlerch/2022-MUSI6106)
 ![GitHub last commit](https://img.shields.io/github/last-commit/alexanderlerch/2022-MUSI6106)
+[![Tests](https://github.com/alexanderlerch/2022-MUSI6106/actions/workflows/cmake.yml/badge.svg)](https://github.com/alexanderlerch/2022-MUSI6106/actions/workflows/cmake.yml)
 ![GitHub](https://img.shields.io/github/license/alexanderlerch/2022-MUSI6106)
 
 # MUSI6106 2022: Audio Software Engineering
