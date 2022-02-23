@@ -9,6 +9,7 @@ Template project for assignments and exercises for the class MUSI6106
 ## Project Structure
 ```console
 |_ 3rdparty: (3rd party dependencies)
+  |_ Fft: simple Fft library
   |_ sndlib: sndfile library (3rdparty with ugly code and lots of warnings)
   |_ googletest: googletest framework
 |_ cmake.modules: (cmake scripts)

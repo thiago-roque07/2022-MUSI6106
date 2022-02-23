@@ -32,6 +32,7 @@ set (PROJECT_DIRECTORIES)
 list (APPEND PROJECT_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/${PROJECT_NAME}Exec)       
 list (APPEND PROJECT_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/AudioFileIO) 
 list (APPEND PROJECT_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/CombFilter) 
+list (APPEND PROJECT_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/Fft) 
     
 # set includes
 set (PROJECT_INCLUDES)
@@ -63,4 +64,5 @@ if (WITH_TESTS)
     # add tests here
     add_test(AudioIo ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/TestExec --gtest_filter=AudioIo* "${CMAKE_SOURCE_DIR}/src/Tests/TestData/")
     add_test(CombFilter ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/TestExec --gtest_filter=CombFilter*)
+    add_test(Fft ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/TestExec --gtest_filter=Fft*)
 endif (WITH_TESTS)
