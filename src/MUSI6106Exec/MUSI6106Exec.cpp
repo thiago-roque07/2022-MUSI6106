@@ -31,23 +31,8 @@ int main(int argc, char* argv[])
     CAudioFileIf::FileSpec_t stFileSpec;
 
     CCombFilterIf   *pInstance = 0;
-    CCombFilterIf::create(pInstance);
     
     showClInfo();
-
-    pCRingBuff = new CRingBuffer<float>(kBlockSize);
-
-    for (int i = 0; i < 5; i++)
-    {
-        pCRingBuff->putPostInc(1.F*i);
-    }
-
-    for (int i = 5; i < 30; i++)
-    {
-        pCRingBuff->getNumValuesInBuffer(); // should be five
-        pCRingBuff->getPostInc(); // should be i-5
-        pCRingBuff->putPostInc(1.F*i);
-    }
 
     // all done
     return 0;
