@@ -4,7 +4,8 @@
 
 #include "MUSI6106Config.h"
 
-#include "RingBuffer.h"
+#include "AudioFileIf.h"
+#include "CombFilterIf.h"
 
 using std::cout;
 using std::endl;
@@ -16,10 +17,22 @@ void    showClInfo ();
 // main function
 int main(int argc, char* argv[])
 {
-    CRingBuffer<float>* pCRingBuff = 0; 
-    
-    static const int kBlockSize = 17;
+    std::string sInputFilePath,                 //!< file paths
+                sOutputFilePath;
 
+    static const int kBlockSize = 1024;
+
+    clock_t time = 0;
+
+    float **ppfAudioData = 0;
+
+    CAudioFileIf *phAudioFile = 0;
+    std::fstream hOutputFile;
+    CAudioFileIf::FileSpec_t stFileSpec;
+
+    CCombFilterIf   *pInstance = 0;
+    CCombFilterIf::create(pInstance);
+    
     showClInfo();
 
     pCRingBuff = new CRingBuffer<float>(kBlockSize);

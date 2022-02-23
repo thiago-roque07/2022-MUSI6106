@@ -140,10 +140,10 @@ private:
         iIdx = (iIdx + iOffset) % m_iBuffLength;
     };
 
-    int m_iBuffLength,      //!< length of the internal buffer
-        m_iReadIdx,         //!< current read index
-        m_iWriteIdx;        //!< current write index
+    int m_iBuffLength = 0,      //!< length of the internal buffer
+        m_iReadIdx = 0,         //!< current read index
+        m_iWriteIdx = 0;        //!< current write index
 
-    T* m_ptBuff;            //!< data buffer
+    T* m_ptBuff = 0;            //!< data buffer
 };
 #endif // __RingBuffer_hdr__
