@@ -1,4 +1,4 @@
-name: CMake
+name: All Tests (CMake)
 
 on:
   push:
