@@ -60,7 +60,6 @@ public:
     }
 
     /*! return the value at the current read index
-    \param fOffset: read at offset from read index
     \return float the value from the read index
     */
     T get() const
