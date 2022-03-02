@@ -76,9 +76,9 @@ public:
             int iLoopLength = iLength / 2; // integer division!
             for (int i = 0; i < iLoopLength; i++)
             {
-                T Tmp                       = pfSrcDest[i];
-                pfSrcDest[i]                 = pfSrcDest[iLength - 1 - i];
-                pfSrcDest[iLength - 1 - i]   = Tmp;
+                T Tmp = pfSrcDest[i];
+                pfSrcDest[i] = pfSrcDest[iLength - 1 - i];
+                pfSrcDest[iLength - 1 - i] = Tmp;
             }
         }
     }
@@ -297,7 +297,7 @@ public:
     \param bAbs specifies whether it is the sum of absolute values or not
     \return float
     */
-    static inline float sum (const float *pfSrc, int iLength, bool bAbs = false)
+    static inline float getSum (const float *pfSrc, int iLength, bool bAbs = false)
     {
         assert (iLength >= 0);
         assert (pfSrc);
@@ -340,12 +340,7 @@ public:
     {
         assert (iLength >= 0);
 
-        float fMean = 0;
-
-        for (int i=0; i < iLength; i++)
-        {
-            fMean  += pfSrc[i];
-        }
+        float fMean = getSum(pfSrc, iLength);
 
         if (iLength > 0)
         {
