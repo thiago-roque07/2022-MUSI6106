@@ -30,7 +30,7 @@ namespace fft_test {
             m_pfTmp = new float[m_iFftLength];
 
             CFft::createInstance(m_pCFftInstance);
-            m_pCFftInstance->initInstance(m_iFftLength, 1, CFft::kWindowHann, CFft::kNoWindow);
+            m_pCFftInstance->initInstance(m_iFftLength, 1, CFft::kWindowHann, CFft::kPreWindow);
         }
 
         virtual void TearDown()
