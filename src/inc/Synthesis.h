@@ -33,6 +33,7 @@ public:
         float fPeriodLength = fSampleFreqInHz / fFreqInHz;
         for (int i = 0; i < iLength; i++)
         {
+            // this seems super inefficient
             if (i%CUtil::float2int<int>(fPeriodLength) <= .5*fPeriodLength)
             {            
                 pfOutBuf[i] = fAmplitude;
