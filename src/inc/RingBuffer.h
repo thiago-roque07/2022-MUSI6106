@@ -40,6 +40,17 @@ public:
         incIdx(m_iWriteIdx);
     }
 
+    /*! add new values of type T to write index and increment write index
+    \param ptNewBuff: new values
+    \param iLength: number of values
+    \return void
+    */
+    void putPostInc(const T* ptNewBuff, int iLength)
+    {
+        put(ptNewBuff, iLength);
+        incIdx(m_iWriteIdx, iLength);
+    }
+
     /*! add a new value of type T to write index
     \param tNewValue the new value
     \return void
@@ -47,6 +58,23 @@ public:
     void put(T tNewValue)
     {
         m_ptBuff[m_iWriteIdx] = tNewValue;
+    }
+
+    /*! add new values of type T to write index
+    \param ptNewBuff: new values
+    \param iLength: number of values
+    \return void
+    */
+    void put(const T* ptNewBuff, int iLength)
+    {
+        assert(iLength <= m_iBuffLength && iLength >= 0);
+
+        // copy two parts: to the end of buffer and after wrap around
+        int iNumValues2End = std::min(iLength, m_iBuffLength - m_iWriteIdx);
+
+        std::memcpy (&m_ptBuff[m_iWriteIdx], ptNewBuff, sizeof(T)*iNumValues2End);
+        if ((iLength - iNumValues2End) > 0)
+            std::memcpy (m_ptBuff, &ptNewBuff[iNumValues2End], sizeof(T)*(iLength - iNumValues2End));
     }
 
     /*! return the value at the current read index and increment the read pointer
@@ -59,12 +87,40 @@ public:
         return tValue;
     }
 
+    /*! return the values starting at the current read index and increment the read pointer
+    \param ptBuff: pointer to where the values will be written
+    \param iLength: number of values
+    \return void
+    */
+    void getPostInc(T* ptBuff, int iLength)
+    {
+        get(ptBuff, iLength);
+        incIdx(m_iReadIdx, iLength);
+    }
+
     /*! return the value at the current read index
     \return float the value from the read index
     */
     T get() const
     {
         return m_ptBuff[m_iReadIdx];
+    }
+
+    /*! return the values starting at the current read index
+    \param ptBuff to where the values will be written
+    \param iLength: number of values
+    \return void
+    */
+    void get(T* ptBuff, int iLength) const
+    {
+        assert(iLength <= m_iBuffLength && iLength >= 0);
+
+        // copy two parts: to the end of buffer and after wrap around
+        int iNumValues2End = std::min(iLength, m_iBuffLength - m_iReadIdx);
+
+        std::memcpy (ptBuff, &m_ptBuff[m_iReadIdx], sizeof(T)*iNumValues2End);
+        if ((iLength - iNumValues2End)>0)
+            std::memcpy (&ptBuff[iNumValues2End], m_ptBuff, sizeof(T)*(iLength - iNumValues2End));
     }
 
     /*! set buffer content and indices to 0
