@@ -43,13 +43,13 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Configure CMake to generate doxygen config file
-      run: cmake -B ${{github.workspace}}/build
+      run: cmake -B ./build
 
     - name: Doxygen
       uses: mattnotmitt/doxygen-action@v1.9.3
       with:
-        working-directory: '.'
-        doxyfile-path: ${{github.workspace}}/build/docs/doxy.config'
+        # working-directory: '.'
+        doxyfile-path: ./build/docs/doxy.config'
  
     # store the doc files
     - name: Upload Output Directory
