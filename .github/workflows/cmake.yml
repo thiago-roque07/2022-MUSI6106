@@ -46,7 +46,6 @@ jobs:
       with:
         working-directory: '.'
         doxyfile-path: ${{github.workspace}}/build/docs/doxy.config'
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DWITH_TESTS=1 -DWITH_DOXYGENTARGET=1
  
     # store the doc files
     - name: Upload Output Directory
