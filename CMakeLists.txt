@@ -72,7 +72,7 @@ endif (WITH_TESTS)
 #-- Add an Option to toggle the generation of the API documentation
 option(WITH_DOXYGENTARGET "Use Doxygen to create the documentation" OFF)
 #-- Configure the Template doxy.config for our specific project
-configure_file(${CMAKE_SOURCE_DIR}/src/doxy.config.in ${PROJECT_BINARY_DIR}/docs/doxy.config  @ONLY IMMEDIATE)
+configure_file(${CMAKE_SOURCE_DIR}/src/doxy.config.in ${PROJECT_BINARY_DIR}/docs/doxy.config)
 if(WITH_DOXYGENTARGET)
     FIND_PACKAGE(Doxygen)
     if (NOT DOXYGEN_FOUND)

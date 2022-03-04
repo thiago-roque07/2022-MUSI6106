@@ -48,8 +48,8 @@ jobs:
     - name: Doxygen
       uses: mattnotmitt/doxygen-action@v1.9.3
       with:
-        working-directory: '.'
-        doxyfile-path: ${{github.workspace}}/build/docs/doxy.config
+        working-directory: ${{github.workspace}}/build
+        doxyfile-path: ./docs/doxy.config
  
     # store the doc files
     - name: Upload Output Directory
