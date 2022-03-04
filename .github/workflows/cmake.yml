@@ -23,7 +23,7 @@ jobs:
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DWITH_TESTS=1
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DWITH_TESTS=1 -DWITH_DOXYGENTARGET=1
 
     - name: Build
       # Build your program with the given configuration
@@ -34,4 +34,52 @@ jobs:
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
+
+  build-docs:
+    name: builds docs and publish
+    runs-on: macos-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Doxygen
+      uses: mattnotmitt/doxygen-action@v1.9.3
+      with:
+        working-directory: '.'
+        doxyfile-path: ${{github.workspace}}/build/docs/doxy.config'
+ 
+    # store the doc files
+    - name: Upload Output Directory
+      uses: actions/upload-artifact@v3
+      with:
+        name: doc-files
+        path: doc
+        retention-days: 1 
+        
+  copy:
+    name: copies docs to gh-pages
+    runs-on: macos-latest
+    needs: build-docs
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: gh-pages
+
+    # prepare the doc files
+    - name: Download Output Directory
+      uses: actions/download-artifact@v3
+      with:
+        name: doc-files
+        path: docs
+
+    # commit the doc files
+    - name: Commit changes
+      uses: EndBug/add-and-commit@v8
+      with:
+        author_name: Alexander Lerch
+        author_email: alexander.lerch@gatech.edu
+        message: 'auto-update docs'
+        add: '["docs/html/*"]'
 
