@@ -44,3 +44,5 @@ Enable ```WITH_TESTS``` to build with GTest support and ```WITH_DOXYGENTARGET```
 
 If new files are added, clear the cache and rerun configuration and generation.
 
+## Documentation
+The automatically generated doxygen documentation can be found at [https://alexanderlerch.github.io/2022-MUSI6106](https://alexanderlerch.github.io/2022-MUSI6106).
