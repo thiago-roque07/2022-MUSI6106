@@ -2,8 +2,8 @@ set(CurrLib Fft)
 
 
 # get all source files
-file(GLOB ${CurrLib}_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}/src/${CurrLib} *.cpp;*.txt;../../3rdParty/Fft/*.cpp)
-file(GLOB ${CurrLib}_HEADERS RELATIVE ${CMAKE_SOURCE_DIR}/src/${CurrLib} *.h;../inc/*.h;../../3rdParty/Fft/*.h)
+file(GLOB ${CurrLib}_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}/src/${CurrLib} *.cpp;*.txt;../../3rdparty/Fft/*.cpp)
+file(GLOB ${CurrLib}_HEADERS RELATIVE ${CMAKE_SOURCE_DIR}/src/${CurrLib} *.h;../inc/*.h;../../3rdparty/Fft/*.h)
 
 ## add include directories
 include_directories(${CMAKE_SOURCE_DIR}/3rdparty/${CurrLib})
