@@ -142,6 +142,29 @@ namespace combfilter_test {
             CHECK_ARRAY_CLOSE(m_ppfInputData[c], m_ppfOutputData[c], m_iDataLength, 1e-3F);
     }
 
+    TEST_F(CombFilter, SetGetParam)
+    {
+       //different call orders
+       m_pCombFilter->init(CCombFilterIf::kCombFIR, m_fMaxDelayLength, m_fSampleRate, m_iNumChannels);
+       m_pCombFilter->setParam(CCombFilterIf::kParamGain, m_fGain);
+       EXPECT_NEAR(m_fGain, m_pCombFilter->getParam(CCombFilterIf::kParamGain), 1e-3);
+
+       m_pCombFilter->setParam(CCombFilterIf::kParamDelay, m_fDelay);
+       EXPECT_NEAR(m_fDelay, m_pCombFilter->getParam(CCombFilterIf::kParamDelay), 1e-3);
+       EXPECT_NEAR(m_fGain, m_pCombFilter->getParam(CCombFilterIf::kParamGain), 1e-3);
+       
+       m_pCombFilter->setParam(CCombFilterIf::kParamGain, m_fGain+.1F);
+       EXPECT_NEAR(m_fGain+.1F, m_pCombFilter->getParam(CCombFilterIf::kParamGain), 1e-3);
+       EXPECT_NEAR(m_fDelay, m_pCombFilter->getParam(CCombFilterIf::kParamDelay), 1e-3);
+
+       // illegal values
+       EXPECT_EQ(false, Error_t::kNoError == m_pCombFilter->setParam(CCombFilterIf::kParamDelay, m_fMaxDelayLength + 100));
+       EXPECT_EQ(false, Error_t::kNoError == m_pCombFilter->setParam(CCombFilterIf::kParamDelay, -m_fDelay));
+
+       // valid but potentially unexpected
+       EXPECT_EQ(Error_t::kNoError, m_pCombFilter->setParam(CCombFilterIf::kParamGain, -5.F));
+    }
+
     TEST_F(CombFilter, FirCancellation)
     {
         m_pCombFilter->init(CCombFilterIf::kCombFIR, m_fMaxDelayLength, m_fSampleRate, m_iNumChannels);
@@ -318,6 +341,7 @@ namespace combfilter_test {
             CHECK_ARRAY_CLOSE(m_ppfInputData[c], m_ppfOutputData[c], m_iDataLength, 1e-3F);
 
         //Iir
+        m_pCombFilter->reset();
         m_pCombFilter->init(CCombFilterIf::kCombIIR, m_fMaxDelayLength, m_fSampleRate, m_iNumChannels);
 
         for (int c = 0; c < m_iNumChannels; c++)
