@@ -1,0 +1,12 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckCSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckIncludeFile.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckLibraryExists.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/FindPython.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/FindPython/Support.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/FindThreads.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/Internal/CheckSourceCompiles.cmake
+C:/Users/thiag/Documents/Git-repos/2022-MUSI6106-exercise_spectrogram/3rdparty/googletest/googletest/CMakeLists.txt
+C:/Users/thiag/Documents/Git-repos/2022-MUSI6106-exercise_spectrogram/3rdparty/googletest/googletest/cmake/internal_utils.cmake

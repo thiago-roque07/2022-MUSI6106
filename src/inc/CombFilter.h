@@ -1,58 +1,58 @@
-#pragma once
+#if !defined(__CombFilter_hdr__)
+#define __CombFilter_hdr__
 
 #include "ErrorDef.h"
-#include "RingBuffer.h"
-#include "CombFilterIf.h"
 
-
+/*! \brief base class for the comb filter (FIR & IIR)
+*/
 class CCombFilterBase
 {
 public:
+    CCombFilterBase (int iMaxDelayInFrames, int iNumChannels);
+    virtual ~CCombFilterBase ();
 
-    CCombFilterBase(int iBufferLengthInSamples, int iNumChannels);
-    virtual ~CCombFilterBase();
+    Error_t resetInstance ();
 
-    Error_t setGain(float fParamValue);
-    Error_t setDelay(float fParamValue);
-    Error_t reset();
+    Error_t setParam (CCombFilterIf::FilterParam_t eParam, float fParamValue);
+    float   getParam (CCombFilterIf::FilterParam_t eParam) const;
 
-    float   getGain();
-    float   getDelay();
-
-    virtual Error_t process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames) = 0;
+    virtual Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames) = 0;
 
 protected:
-    CRingBuffer<float>** m_ppCRingBuffer;
+    CRingBuffer<float>  **m_ppCRingBuffer;  
 
-    int m_iBuffLength;              //!< MAX length of the internal buffer
-    int m_iNumChannels;
+    float   m_afParam[CCombFilterIf::kNumFilterParams];
+    float   m_aafParamRange[CCombFilterIf::kNumFilterParams][2];
 
-    float ParamGain;         //!< gain as factor (usually -1...1)
-    float ParamDelay;        //!< delay in SAMPLES for specification of comb width
+    int     m_iNumChannels;
 
-    bool isInitialized;
-    bool firstRound;
- 
 private:
     CCombFilterBase(const CCombFilterBase& that);
+
+    bool    isInParamRange (CCombFilterIf::FilterParam_t eParam, float fValue);
 };
 
-class FilterIIR : public CCombFilterBase
+
+/*! \brief FIR comb filter implementation
+*/
+class CCombFilterFir : public CCombFilterBase
 {
 public:
-    FilterIIR(int iBufferLengthInSamples, int iNumChannels) : CCombFilterBase(iBufferLengthInSamples, iNumChannels) {};
+    CCombFilterFir (int iMaxDelayInFrames, int iNumChannels):CCombFilterBase(iMaxDelayInFrames, iNumChannels){};
+    virtual ~CCombFilterFir (){};
 
-    Error_t process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames) override;
-
-private:
+    Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames) override;
 };
 
-class FilterFIR : public CCombFilterBase
+/*! \brief IIR comb filter implementation
+*/
+class CCombFilterIir : public CCombFilterBase
 {
 public:
-    FilterFIR(int iBufferLengthInSamples, int iNumChannels) : CCombFilterBase(iBufferLengthInSamples, iNumChannels) {};
+    CCombFilterIir (int iMaxDelayInFrames, int iNumChannels);
+    virtual ~CCombFilterIir (){};
 
-    Error_t process(float** ppfInputBuffer, float** ppfOutputBuffer, int iNumberOfFrames) override;
-
-private:
+    Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames) override;
 };
+
+#endif // #if !defined(__CombFilter_hdr__)

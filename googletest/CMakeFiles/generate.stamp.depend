@@ -1,0 +1,4 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-3.22/Modules/CMakeDependentOption.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/GNUInstallDirs.cmake
+C:/Users/thiag/Documents/Git-repos/2022-MUSI6106-exercise_spectrogram/3rdparty/googletest/CMakeLists.txt

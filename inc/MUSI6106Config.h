@@ -21,12 +21,15 @@
 //////////////////////////////////////////////////////////
 // set module switches
 #ifndef WITH_TESTS //!< UnitTest++ should be used for for testing
-/* #undef WITH_TESTS */
+#define WITH_TESTS
 #endif // WITH_TESTS
 
 // set the version number
 #define MUSI6106_VERSION_MAJOR 0
 #define MUSI6106_VERSION_MINOR 0
 #define MUSI6106_VERSION_PATCH 0
+
+// for testing only
+#define CMAKE_SOURCE_DIR "C:/Users/thiag/Documents/Git-repos/2022-MUSI6106-exercise_spectrogram"
 
 #endif // __MigEdit_config_hdr__

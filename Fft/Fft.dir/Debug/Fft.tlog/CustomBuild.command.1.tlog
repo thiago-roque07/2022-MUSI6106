@@ -1,0 +1,10 @@
+^C:\USERS\THIAG\DOCUMENTS\GIT-REPOS\2022-MUSI6106-EXERCISE_SPECTROGRAM\SRC\FFT\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/thiag/Documents/Git-repos/2022-MUSI6106-exercise_spectrogram -BC:/Users/thiag/Documents/Git-repos/2022-MUSI6106-exercise_spectrogram --check-stamp-file C:/Users/thiag/Documents/Git-repos/2022-MUSI6106-exercise_spectrogram/Fft/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
