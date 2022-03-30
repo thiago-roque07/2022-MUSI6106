@@ -1,5 +1,2 @@
-﻿  Building Custom Rule C:/Users/thiag/Documents/Git-repos/2022-MUSI6106-exercise_spectrogram/src/Fft/CMakeLists.txt
-  rvfft.cpp
-  Fft.cpp
-  Generating Code...
+﻿  Fft.cpp
   Fft.vcxproj -> C:\Users\thiag\Documents\Git-repos\2022-MUSI6106-exercise_spectrogram\lib\Debug\libFft.lib

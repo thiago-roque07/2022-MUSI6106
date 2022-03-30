@@ -6,6 +6,7 @@
 
 #include "AudioFileIf.h"
 #include "RingBuffer.h"
+#include "Fft.h"
 
 using std::cout;
 using std::endl;
@@ -34,6 +35,10 @@ int main(int argc, char* argv[])
 
     CRingBuffer<float>** ppfftBuffer = 0;
 
+    CFft* pCFft = nullptr;
+    CFft::createInstance(pCFft);
+    pCFft->initInstance(kBlockSize);
+    pfSpectrum = new float[kBlockSize];
 
     showClInfo();
 
