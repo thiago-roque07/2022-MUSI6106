@@ -30,11 +30,11 @@ public:
     static const int getVersion (const Version_t eVersionIdx);
     static const char* getBuildDate ();
 
-    static Error_t createInstance (CVibrato*& pCVibrato);
-    static Error_t destroyInstance (CVibrato*& pCVibrato);
+    static Error_t create (CVibrato*& pCVibrato);
+    static Error_t destroy (CVibrato*& pCVibrato);
 
-    Error_t initInstance (float fMaxModWidthInS, float fSampleRateInHz, int iNumChannels);
-    Error_t resetInstance ();
+    Error_t init (float fMaxModWidthInS, float fSampleRateInHz, int iNumChannels);
+    Error_t reset ();
 
     Error_t setParam (VibratoParam_t eParam, float fParamValue);
     float getParam (VibratoParam_t eParam) const;

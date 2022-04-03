@@ -23,13 +23,13 @@ CVibrato::CVibrato () :
 {
 
     // this never hurts
-    this->resetInstance ();
+    this->reset ();
 }
 
 
 CVibrato::~CVibrato ()
 {
-    this->resetInstance ();
+    this->reset ();
 }
 
 const int  CVibrato::getVersion (const Version_t eVersionIdx)
@@ -59,7 +59,7 @@ const char*  CVibrato::getBuildDate ()
     return kCVibratoBuildDate;
 }
 
-Error_t CVibrato::createInstance (CVibrato*& pCVibrato)
+Error_t CVibrato::create (CVibrato*& pCVibrato)
 {
     pCVibrato = new CVibrato ();
 
@@ -70,12 +70,12 @@ Error_t CVibrato::createInstance (CVibrato*& pCVibrato)
     return Error_t::kNoError;
 }
 
-Error_t CVibrato::destroyInstance (CVibrato*& pCVibrato)
+Error_t CVibrato::destroy (CVibrato*& pCVibrato)
 {
     if (!pCVibrato)
         return Error_t::kUnknownError;
     
-    pCVibrato->resetInstance ();
+    pCVibrato->reset ();
     
     delete pCVibrato;
     pCVibrato = 0;
@@ -84,7 +84,7 @@ Error_t CVibrato::destroyInstance (CVibrato*& pCVibrato)
 
 }
 
-Error_t CVibrato::initInstance( float fMaxModWidthInS, float fSampleRateInHz, int iNumChannels )
+Error_t CVibrato::init( float fMaxModWidthInS, float fSampleRateInHz, int iNumChannels )
 {
     // set parameters
     m_fSampleRate       = fSampleRateInHz;
@@ -112,7 +112,7 @@ Error_t CVibrato::initInstance( float fMaxModWidthInS, float fSampleRateInHz, in
     return Error_t::kNoError;
 }
 
-Error_t CVibrato::resetInstance ()
+Error_t CVibrato::reset ()
 {
     for (int i = 0; i < kNumVibratoParams; i++)
         setParam((VibratoParam_t)i, 0);

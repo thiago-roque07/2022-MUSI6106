@@ -33,8 +33,8 @@ namespace vibrato_test {
             m_fModWidth = 0.1F;
             m_fModFreq = 1.F;
 
-            CVibrato::createInstance(m_pVibrato);
-            m_pVibrato->initInstance(m_fMaxModWidth, m_fSampleRate, m_iNumChannels);
+            CVibrato::create(m_pVibrato);
+            m_pVibrato->init(m_fMaxModWidth, m_fSampleRate, m_iNumChannels);
 
             m_ppfInputData = new float* [m_iNumChannels];
             m_ppfOutputData = new float* [m_iNumChannels];
@@ -61,7 +61,7 @@ namespace vibrato_test {
             delete[] m_ppfOutputData;
             delete[] m_ppfInputData;
 
-            CVibrato::destroyInstance(m_pVibrato);
+            CVibrato::destroy(m_pVibrato);
         }
 
         void process ()
@@ -132,8 +132,8 @@ namespace vibrato_test {
 
         process();
 
-        m_pVibrato->resetInstance();
-        m_pVibrato->initInstance(m_fMaxModWidth,m_fSampleRate,m_iNumChannels);
+        m_pVibrato->reset();
+        m_pVibrato->init(m_fMaxModWidth,m_fSampleRate,m_iNumChannels);
         m_pVibrato->setParam(CVibrato::kParamModFreqInHz, 2);
         m_pVibrato->setParam(CVibrato::kParamModWidthInS, .1F);
         {
