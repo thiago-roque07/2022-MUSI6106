@@ -18,6 +18,7 @@ Template project for assignments and exercises for the class MUSI6106
 |_ src: source code
   |_ AudioFileIO: library wrapping sndfile (3rdparty)
   |_ CombFilter: combfilter library (assignment 1)
+  |_ FastConv: library for a fast convolution
   |_ inc: internal headers
   |_ MUSI6106Exec: code for executable binary
   |_ Tests: all code related to tests
@@ -42,8 +43,6 @@ cmake -B ./bld/ -DCMAKE_BUILD_TYPE=DEBUG
 cmake --build ./bld/ --config Debug
 ```
 Enable ```WITH_TESTS``` to build with GTest support and ```WITH_DOXYGENTARGET``` to add a target for creating a doxygen documentation for your project.
-
-If new files are added, clear the cache and rerun configuration and generation.
 
 If new files are added, clear the cache and rerun configuration and generation.
 

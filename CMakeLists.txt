@@ -34,6 +34,7 @@ list (APPEND PROJECT_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/AudioFileIO)
 list (APPEND PROJECT_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/CombFilter) 
 list (APPEND PROJECT_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/Fft) 
 list (APPEND PROJECT_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/Vibrato) 
+list (APPEND PROJECT_DIRECTORIES ${CMAKE_SOURCE_DIR}/src/FastConv)
     
 # set includes
 set (PROJECT_INCLUDES)
@@ -67,6 +68,7 @@ if (WITH_TESTS)
     add_test(CombFilter ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/TestExec --gtest_filter=CombFilter*)
     add_test(Fft ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/TestExec --gtest_filter=Fft*)
     add_test(Vibrato ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/TestExec --gtest_filter=Vibrato*)
+    add_test(FastConv ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/TestExec --gtest_filter=FastConv*)
 endif (WITH_TESTS)
 
 #######################################################################################################
