@@ -11,6 +11,13 @@
 class CFastConv
 {
 public:
+    enum ConvCompMode_t
+    {
+        kTimeDomain,
+        kFreqDomain,
+
+        kNumConvCompModes
+    };
 
     CFastConv(void);
     virtual ~CFastConv(void);
@@ -21,7 +28,7 @@ public:
     \param iBlockLength processing block size
     \return Error_t
     */
-    Error_t init(float* pfImpulseResponse, int iLengthOfIr, int iBlockLength = 8192);
+    Error_t init(float* pfImpulseResponse, int iLengthOfIr, int iBlockLength = 8192, ConvCompMode_t eCompMode = kFreqDomain);
 
     /*! resets all internal class members
     \return Error_t
