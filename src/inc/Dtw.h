@@ -59,7 +59,52 @@ public:
     Error_t getPath (int **ppiPathResult) const;
 
 private:
+    enum Directions_t
+    {
+        kHoriz,
+        kVert,
+        kDiag,
+
+        kNumDirections
+    };
+    enum InternalMemory_t
+    {
+        kRowCurr,
+        kRowNext,
+
+        kNumVectors
+    };
+
+    static inline Directions_t findMinimum (float fHorizCost, float fVertCost, float fDiagCost, float &fResultCost)
+    {
+        Directions_t eDirection = kDiag;
+        fResultCost             = fDiagCost;
+
+        if (fHorizCost < fDiagCost)
+        {
+            eDirection  = kHoriz;
+            fResultCost = fHorizCost;
+        }
+        if (fVertCost < fHorizCost && fVertCost < fDiagCost)
+        {
+            eDirection  = kVert;
+            fResultCost = fVertCost;
+        }
+
+        return eDirection;
+    }
+
+
     bool m_bIsInitialized;
+    bool m_bWasProcessed;
+
+    float *m_apfCost[kNumVectors];
+    float m_fOverallCost;
+    unsigned char  **m_ppePathIdx;
+    int   m_iLengthOfPath;
+    int   m_aiMatrixDimensions[kNumMatrixDimensions];
+
+    static const int aiDecrement[kNumDirections][kNumMatrixDimensions];
 };
 
 
