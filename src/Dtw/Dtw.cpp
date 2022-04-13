@@ -111,16 +111,16 @@ Error_t CDtw::process(float **ppfDistanceMatrix)
     for (int i = 1; i < m_aiMatrixDimensions[kRow]; i++)
     {
         // init the variables we need for the current row (remember the cost in the first column, and then increment it)
-        m_apfCost[kRowCurr][0]      = fFirstColCost;
-        fFirstColCost              += ppfDistanceMatrix[i][0];
-        m_apfCost[kRowNext][0]      = fFirstColCost;
+        m_apfCost[kRowCurr][0]  = fFirstColCost;
+        fFirstColCost          += ppfDistanceMatrix[i][0];
+        m_apfCost[kRowNext][0]  = fFirstColCost;
 
         for (int j = 1; j < m_aiMatrixDimensions[kCol]; j++)
         {
-            m_ppePathIdx[i][j]      = static_cast<unsigned char>(findMinimum(   m_apfCost[kRowNext][j-1],   // horiz
-                                                                                m_apfCost[kRowCurr][j],     // vert
-                                                                                m_apfCost[kRowCurr][j-1],   // diag
-                                                                                m_apfCost[kRowNext][j]));   // minimum cost output
+            m_ppePathIdx[i][j]  = static_cast<unsigned char>(findMinimum(   m_apfCost[kRowNext][j-1],   // horiz
+                                                                            m_apfCost[kRowCurr][j],     // vert
+                                                                            m_apfCost[kRowCurr][j-1],   // diag
+                                                                            m_apfCost[kRowNext][j]));   // minimum cost output
             m_apfCost[kRowNext][j] += ppfDistanceMatrix[i][j];
         }
 
