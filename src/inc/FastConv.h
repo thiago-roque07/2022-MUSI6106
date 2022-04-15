@@ -50,7 +50,10 @@ public:
     Error_t flushBuffer(float* pfOutputBuffer);
 
 private:
-
+    ConvCompMode_t m_ConvType;
+    int m_iLengthOfIr;
+    float *m_pfImpulseResponse;
+    float *m_pfTail;
 };
 
 
