@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ErrorDef.h"
+#include "Fft.h"
 
 /*! \brief interface for fast convolution
 */
@@ -54,6 +55,22 @@ private:
     int m_iLengthOfIr;
     float *m_pfImpulseResponse;
     float *m_pfTail;
+    
+    float* m_pfBlockBuffer;
+    int m_iblockSize;
+
+
+    float *m_pfTimeInput;
+    float* m_pfTimeIr;
+    CFft::complex_t *m_pfFreqInput;
+    CFft::complex_t* m_pfFreqIr;
+    float *m_pfReal;
+    float *m_pfImag;
+    float *m_pfTmp;
+
+    int m_iFftLength;
+
+    CFft* m_pCFftInstance;
 };
 
 

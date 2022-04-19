@@ -34,8 +34,6 @@ namespace fastconv_test {
                 m_Ir[i] = std::rand();
             }
             m_Impulse[3] = 1;
-
-            // CFastConv::init();
             
         }
 
