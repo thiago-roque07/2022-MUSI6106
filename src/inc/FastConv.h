@@ -61,11 +61,18 @@ private:
 
 
     float *m_pfTimeInput;
-    float* m_pfTimeIr;
+    float *m_pfTimeIr;
+    float *m_pfTimeConv;
     CFft::complex_t *m_pfFreqInput;
-    CFft::complex_t* m_pfFreqIr;
-    float *m_pfReal;
-    float *m_pfImag;
+    CFft::complex_t *m_pfFreqIr;
+    CFft::complex_t *m_pfFreqConv;
+    float *m_pfRealInput;
+    float *m_pfImagInput;
+    float *m_pfRealIr;
+    float *m_pfImagIr;
+    float *m_pfRealConv;
+    float *m_pfImagConv;
+
     float *m_pfTmp;
 
     int m_iFftLength;
