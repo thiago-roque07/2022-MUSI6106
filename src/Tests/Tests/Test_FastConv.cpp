@@ -1,3 +1,5 @@
+
+
 #include "MUSI6106Config.h"
 
 #ifdef WITH_TESTS
@@ -23,6 +25,8 @@ namespace fastconv_test {
     protected:
         void SetUp() override
         {
+            m_pCFastConv = new CFastConv();
+
             m_IrLength = 51;
             m_ImpulseLength = 10;
             m_Ir = new float[m_IrLength];
@@ -34,7 +38,7 @@ namespace fastconv_test {
                 m_Ir[i] = std::rand();
             }
             m_Impulse[3] = 1;
-            
+
         }
 
         virtual void TearDown()
@@ -53,28 +57,111 @@ namespace fastconv_test {
 
     TEST_F(FastConv, Identity_TD)
     {
+        float *pfOutput = new float[m_ImpulseLength];
+        CVector::setZero(pfOutput, 10);
+
+        m_pCFastConv->init(m_Ir,m_IrLength,m_IrLength,CFastConv::kTimeDomain);
+        m_pCFastConv->process(pfOutput, m_Impulse, 10);
+
+        CHECK_ARRAY_CLOSE(m_Ir, pfOutput+3, 7, 1e-3);
+
+        delete[] pfOutput;
     }
 
     TEST_F(FastConv, FlushBuffer_TD)
     {
+        float *pfOutput = new float[m_IrLength];
+        CVector::setZero(pfOutput, m_IrLength);
+
+        m_pCFastConv->init(m_Ir,m_IrLength,m_IrLength,CFastConv::kTimeDomain);
+        m_pCFastConv->process(pfOutput, m_Impulse, 10);
+        m_pCFastConv->flushBuffer(pfOutput);
+
+        CHECK_ARRAY_CLOSE(m_Ir+7,pfOutput,44,1e-3);
+
+        delete[] pfOutput;
     }
 
     TEST_F(FastConv, Blocksize_TD)
     {
+        float *pfInput = new float[10000];
+        CVector::setZero(pfInput, 10000);
+        pfInput[3] = 1.F;
+
+        float *pfOutput = new float[10000];
+        CVector::setZero(pfOutput, 10000);
+
+        int blockSizes[8] = { 1, 13, 1023, 2048, 1, 17, 5000, 1897};
+
+        m_pCFastConv->init(m_Ir,m_IrLength,m_IrLength,CFastConv::kTimeDomain);
+        for (int i = 0, j = 0; i < 8; j += blockSizes[i++])
+            m_pCFastConv->process(pfOutput+j, pfInput+j, blockSizes[i]);
+
+        for (int i = 0; i < m_IrLength && i + 3 < 10000; i++)
+            EXPECT_NEAR(m_Ir[i], pfOutput[i+3], 1e-3);
+
+        m_pCFastConv->flushBuffer(pfOutput);
+
+        for (int i = m_IrLength + 3; i < 10000; i++)
+            EXPECT_EQ(pfOutput[i], 0);
+
+        delete[] pfInput;
+        delete[] pfOutput;
     }
 
     TEST_F(FastConv, Identity_FD)
     {
+        float *pfOutput = new float[m_ImpulseLength];
+        CVector::setZero(pfOutput, 10);
+
+        m_pCFastConv->init(m_Ir,m_IrLength,m_IrLength,CFastConv::kFreqDomain);
+        m_pCFastConv->process(pfOutput, m_Impulse, 10);
+
+        CHECK_ARRAY_CLOSE(m_Ir, pfOutput+3, 7, 1e-3);
+
+        delete[] pfOutput;
     }
 
     TEST_F(FastConv, FlushBuffer_FD)
     {
+        float *pfOutput = new float[m_IrLength];
+        CVector::setZero(pfOutput, m_IrLength);
+
+        m_pCFastConv->init(m_Ir,m_IrLength,m_IrLength,CFastConv::kFreqDomain);
+        m_pCFastConv->process(pfOutput, m_Impulse, 10);
+        m_pCFastConv->flushBuffer(pfOutput);
+
+        CHECK_ARRAY_CLOSE(m_Ir+7,pfOutput,44,1e-3);
+
+        delete[] pfOutput;
     }
 
     TEST_F(FastConv, Blocksize_FD)
     {
+        float *pfInput = new float[10000];
+        CVector::setZero(pfInput, 10000);
+        pfInput[3] = 1.F;
+
+        float *pfOutput = new float[10000];
+        CVector::setZero(pfOutput, 10000);
+
+        int blockSizes[8] = { 1, 13, 1023, 2048, 1, 17, 5000, 1897};
+
+        m_pCFastConv->init(m_Ir,m_IrLength,m_IrLength,CFastConv::kFreqDomain);
+        for (int i = 0, j = 0; i < 8; j += blockSizes[i++])
+            m_pCFastConv->process(pfOutput+j, pfInput+j, blockSizes[i]);
+
+        for (int i = 0; i < m_IrLength && i + 3 < 10000; i++)
+            EXPECT_NEAR(m_Ir[i], pfOutput[i+3], 1e-3);
+
+        m_pCFastConv->flushBuffer(pfOutput);
+
+        for (int i = m_IrLength + 3; i < 10000; i++)
+            EXPECT_EQ(pfOutput[i], 0);
+
+        delete[] pfInput;
+        delete[] pfOutput;
     }
 }
 
 #endif //WITH_TESTS
-
