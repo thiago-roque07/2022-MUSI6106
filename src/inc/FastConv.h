@@ -53,16 +53,16 @@ public:
 private:
     ConvCompMode_t m_ConvType;
     int m_iLengthOfIr;
-    float *m_pfImpulseResponse;
-    float *m_pfTail;
-    
-    float* m_pfBlockBuffer;
     int m_iblockSize;
+    int m_iTailIndex;
 
-
+    float* m_pfBlockBuffer;
+    float* m_pfImpulseResponse;
+    float* m_pfTail;
     float *m_pfTimeInput;
     float *m_pfTimeIr;
     float *m_pfTmpConv;
+    float *m_pfInputTail;
     CFft::complex_t *m_pfFreqInput;
     CFft::complex_t *m_pfFreqIr;
     CFft::complex_t *m_pfFreqConv;
@@ -72,7 +72,6 @@ private:
     float *m_pfImagIr;
     float *m_pfRealConv;
     float *m_pfImagConv;
-
     float *m_pfTimeConv;
 
     int m_iFftLength;

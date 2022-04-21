@@ -35,7 +35,8 @@ namespace fastconv_test {
             for (int i = 0; i < m_IrLength; i++)
             {
                 if (i < m_ImpulseLength) { m_Impulse[i] = 0; };
-                m_Ir[i] = std::rand();
+                //m_Ir[i] = std::rand();
+                m_Ir[i] = i;
             }
             m_Impulse[3] = 1;
 
@@ -58,10 +59,10 @@ namespace fastconv_test {
     TEST_F(FastConv, Identity_TD)
     {
         float *pfOutput = new float[m_ImpulseLength];
-        CVector::setZero(pfOutput, 10);
+        CVector::setZero(pfOutput, m_ImpulseLength);
 
         m_pCFastConv->init(m_Ir,m_IrLength,m_IrLength,CFastConv::kTimeDomain);
-        m_pCFastConv->process(pfOutput, m_Impulse, 10);
+        m_pCFastConv->process(pfOutput, m_Impulse, m_ImpulseLength);
 
         CHECK_ARRAY_CLOSE(m_Ir, pfOutput+3, 7, 1e-3);
 
@@ -70,16 +71,19 @@ namespace fastconv_test {
 
     TEST_F(FastConv, FlushBuffer_TD)
     {
-        float *pfOutput = new float[m_IrLength];
-        CVector::setZero(pfOutput, m_IrLength);
+        float *pfOutput = new float[m_ImpulseLength];
+        CVector::setZero(pfOutput, m_ImpulseLength);
+        float* pfTail = new float[m_IrLength-1];
+        CVector::setZero(pfTail, m_IrLength-1);
 
         m_pCFastConv->init(m_Ir,m_IrLength,m_IrLength,CFastConv::kTimeDomain);
-        m_pCFastConv->process(pfOutput, m_Impulse, 10);
-        m_pCFastConv->flushBuffer(pfOutput);
+        m_pCFastConv->process(pfOutput, m_Impulse, m_ImpulseLength);
+        m_pCFastConv->flushBuffer(pfTail);
 
-        CHECK_ARRAY_CLOSE(m_Ir+7,pfOutput,44,1e-3);
+        CHECK_ARRAY_CLOSE(m_Ir+7, pfTail,44,1e-3);
 
         delete[] pfOutput;
+        delete[] pfTail;
     }
 
     TEST_F(FastConv, Blocksize_TD)
@@ -91,22 +95,28 @@ namespace fastconv_test {
         float *pfOutput = new float[10000];
         CVector::setZero(pfOutput, 10000);
 
+        float* pfTail = new float[m_IrLength - 1];
+        CVector::setZero(pfTail, m_IrLength - 1);
+
         int blockSizes[8] = { 1, 13, 1023, 2048, 1, 17, 5000, 1897};
 
-        m_pCFastConv->init(m_Ir,m_IrLength,m_IrLength,CFastConv::kTimeDomain);
-        for (int i = 0, j = 0; i < 8; j += blockSizes[i++])
-            m_pCFastConv->process(pfOutput+j, pfInput+j, blockSizes[i]);
+        //m_pCFastConv->init(m_Ir,m_IrLength,m_IrLength,CFastConv::kTimeDomain);
+        //for (int i = 0, j = 0; i < 8; j += blockSizes[i++])
+        //    m_pCFastConv->process(pfOutput+j, pfInput+j, blockSizes[i]);
 
-        for (int i = 0; i < m_IrLength && i + 3 < 10000; i++)
-            EXPECT_NEAR(m_Ir[i], pfOutput[i+3], 1e-3);
+        //for (int i = 0; i < m_IrLength && i + 3 < 10000; i++)
+        //    EXPECT_NEAR(m_Ir[i], pfOutput[i+3], 1e-3);
 
-        m_pCFastConv->flushBuffer(pfOutput);
+        //m_pCFastConv->flushBuffer(pfTail);
 
-        for (int i = m_IrLength + 3; i < 10000; i++)
-            EXPECT_EQ(pfOutput[i], 0);
+        //for (int i = m_IrLength + 3; i < 10000; i++)
+        //    EXPECT_EQ(pfOutput[i], 0);
+
+        for (int i=0; i < 8)
 
         delete[] pfInput;
         delete[] pfOutput;
+        delete[] pfTail;
     }
 
     TEST_F(FastConv, Identity_FD)

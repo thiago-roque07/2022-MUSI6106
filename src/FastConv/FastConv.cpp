@@ -9,7 +9,7 @@ CFastConv::~CFastConv( void )
 {
     delete[] m_pfImpulseResponse;
     delete[] m_pfTail;
-
+    delete[] m_pfInputTail;
     delete[] m_pfBlockBuffer;
 
     delete[] m_pfTimeInput;
@@ -33,6 +33,7 @@ Error_t CFastConv::init(float *pfImpulseResponse, int iLengthOfIr, int iBlockLen
     m_ConvType = eCompMode;
     m_pfImpulseResponse = new float [iLengthOfIr];
     m_pfTail = new float [iLengthOfIr-1];
+    m_pfInputTail = new float[(2 * iLengthOfIr) - 1];
     m_pfBlockBuffer = new float[iBlockLength];
 
     m_pfTimeInput = new float[2 * iBlockLength];
@@ -74,6 +75,24 @@ Error_t CFastConv::reset()
 
 Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, int iLengthOfBuffers )
 {
+    if (m_iLengthOfIr < iLengthOfBuffers)
+    {
+        m_iTailIndex = iLengthOfBuffers - m_iLengthOfIr + 1;
+        for (int i = m_iTailIndex; i < iLengthOfBuffers + m_iLengthOfIr - 1; i++)
+        {
+            m_pfInputTail[i - m_iTailIndex] = (i < iLengthOfBuffers) ? pfInputBuffer[i] : 0;
+        }
+    }
+    else
+    {
+        m_iTailIndex = iLengthOfBuffers;
+        for (int i = 0; i < iLengthOfBuffers + m_iLengthOfIr - 1; i++)
+        {
+            m_pfInputTail[i] = (i < iLengthOfBuffers) ? pfInputBuffer[i] : 0;
+        }
+    }
+    
+
     if (m_ConvType == CFastConv::ConvCompMode_t::kTimeDomain)
     {
         for (int i = 0; i < iLengthOfBuffers; i++) {
@@ -83,18 +102,16 @@ Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, i
                 pfOutputBuffer[i] += pfInputBuffer[i - j] * m_pfImpulseResponse[j];
             }
         }
-        for (int i = iLengthOfBuffers; i < iLengthOfBuffers + m_iLengthOfIr - 1; i++) {
-            m_pfTail[i - iLengthOfBuffers] = 0;
-            for (int j = 0; j < m_iLengthOfIr; j++) {
-                if (i - j >= iLengthOfBuffers) break;
-                m_pfTail[i - iLengthOfBuffers] += pfInputBuffer[i - j] * m_pfImpulseResponse[j];
-            }
-        }
         return Error_t::kNoError;
     }
 
     else if (m_ConvType == CFastConv::ConvCompMode_t::kFreqDomain)
     {
+        for (int i = 0; i < iLengthOfBuffers; i++) 
+        {
+            pfOutputBuffer[i] = 0;
+        }
+
         int nBlockInput = 0;
         int nBlockIr = 0;
         while (nBlockInput < (iLengthOfBuffers / m_iblockSize))
@@ -126,7 +143,7 @@ Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, i
 
                 for (int i = m_iblockSize * nBlockIr; i < m_iblockSize * (nBlockIr + 2); i++)
                 {
-                    pfOutputBuffer[i] = m_pfTmpConv[i];
+                    pfOutputBuffer[i] =+ m_pfTmpConv[i];
                 }
                 nBlockIr++;
             }
@@ -141,10 +158,12 @@ Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, i
 
 Error_t CFastConv::flushBuffer(float* pfOutputBuffer)
 {
-    for (int i = 0; i < m_iLengthOfIr-1; i++)
-    {
-        pfOutputBuffer[i] = m_pfTail[i];
+    for (int i = m_iTailIndex; i < m_iTailIndex + m_iLengthOfIr - 1; i++) {
+        pfOutputBuffer[i - m_iTailIndex] = 0;
+        for (int j = 0; j < m_iLengthOfIr; j++) {
+            if (i - j < 0) break;
+            pfOutputBuffer[i - m_iTailIndex] += m_pfInputTail[i - j] * m_pfImpulseResponse[j];
+        }
     }
-
     return Error_t::kNoError;
 }
