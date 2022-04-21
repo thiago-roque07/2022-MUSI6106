@@ -52,9 +52,9 @@ public:
 
 private:
     ConvCompMode_t m_ConvType;
-    int m_iLengthOfIr;
-    int m_iblockSize;
-    int m_iTailIndex;
+    int m_iLengthOfIr = 0;
+    int m_iblockSize = 0;
+    int m_iTailIndex = 0;
 
     float* m_pfBlockBuffer;
     float* m_pfImpulseResponse;
@@ -74,8 +74,12 @@ private:
     float *m_pfImagConv;
     float *m_pfTimeConv;
 
+    float* m_pfTestTime;
+    float* m_pfTestIr;
+
     int m_iFftLength;
 
+    bool m_bLongBlock = false;
     CFft* m_pCFftInstance;
 };
 
