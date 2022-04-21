@@ -25,6 +25,10 @@ CFastConv::~CFastConv( void )
     delete[] m_pfRealConv;
     delete[] m_pfImagConv;
     delete[] m_pfTmpConv;
+
+    m_pCFftInstance->resetInstance();
+    CFft::destroyInstance(m_pCFftInstance);
+    
     reset();
 }
 
@@ -54,6 +58,8 @@ Error_t CFastConv::init(float *pfImpulseResponse, int iLengthOfIr, int iBlockLen
 
     m_iLengthOfIr = iLengthOfIr;
     m_iblockSize = iBlockLength;
+
+    CFft::createInstance(m_pCFftInstance);
 
     if (m_ConvType == CFastConv::ConvCompMode_t::kFreqDomain)
     {
@@ -103,8 +109,35 @@ Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, i
             }
         }
         return Error_t::kNoError;
-    }
 
+        //for (int i = 0; i < iLengthOfBuffers; i++)
+        //{
+        //    pfOutputBuffer[i] = 0;
+        //}
+        //int nBlockInput = 0;
+        //int nBlockIr = 0;
+        //while (nBlockInput < (iLengthOfBuffers / m_iblockSize))
+        //{
+        //    while (nBlockIr < (m_iLengthOfIr / m_iblockSize))
+        //    {
+        //        //for (int i = 0; i < iLengthOfBuffers; i++) {
+        //        //    pfOutputBuffer[i] = 0;
+        //        //    for (int j = 0; j < m_iLengthOfIr; j++) {
+        //        //        if (i - j < 0) break;
+        //        //        pfOutputBuffer[i] += pfInputBuffer[i - j] * m_pfImpulseResponse[j];
+        //        //    }
+        //        //}
+        //        for (int i = m_iblockSize * nBlockIr; i < m_iblockSize * (nBlockIr + 1); i++)
+        //        {
+        //            pfOutputBuffer[i] = +m_pfTmpConv[i];
+        //        }
+        //        nBlockIr++;
+        //    }
+        //    nBlockInput++;
+        //}
+        //return Error_t::kNoError;
+
+    }
     else if (m_ConvType == CFastConv::ConvCompMode_t::kFreqDomain)
     {
         for (int i = 0; i < iLengthOfBuffers; i++) 
@@ -114,13 +147,13 @@ Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, i
 
         int nBlockInput = 0;
         int nBlockIr = 0;
-        while (nBlockInput < (iLengthOfBuffers / m_iblockSize))
+        while ((nBlockInput < (iLengthOfBuffers / m_iblockSize))||(nBlockInput==0&& (iLengthOfBuffers / m_iblockSize)==0))
         {
             for (int i = m_iblockSize * nBlockInput; i < m_iblockSize * (nBlockInput + 2); i++)
             {
                 m_pfTimeInput[i] = (i < m_iblockSize * (nBlockInput + 1)) ? pfInputBuffer[i] : 0;
             }
-            while (nBlockIr < (m_iLengthOfIr / m_iblockSize))
+            while ((nBlockIr < (m_iLengthOfIr / m_iblockSize)) || (nBlockIr == 0 && (iLengthOfBuffers / m_iblockSize) == 0))
             {
                 for (int i = m_iblockSize * nBlockIr; i < m_iblockSize * (nBlockIr + 2); i++)
                 {
