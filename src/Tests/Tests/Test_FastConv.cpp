@@ -128,7 +128,7 @@ namespace fastconv_test {
         float *pfOutput = new float[m_ImpulseLength];
         CVector::setZero(pfOutput, 10);
 
-        m_pCFastConv->init(m_Ir,m_IrLength,256,CFastConv::kFreqDomain);
+        m_pCFastConv->init(m_Ir,m_IrLength,64,CFastConv::kFreqDomain);
         m_pCFastConv->process(pfOutput, m_Impulse, 10);
 
         CHECK_ARRAY_CLOSE(m_Ir, pfOutput+3, 7, 1e-3);
