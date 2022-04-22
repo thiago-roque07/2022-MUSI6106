@@ -58,7 +58,6 @@ private:
 
     float* m_pfBlockBuffer;
     float* m_pfImpulseResponse;
-    float* m_pfTail;
     float *m_pfTimeInput;
     float *m_pfTimeIr;
     float *m_pfTmpConv;

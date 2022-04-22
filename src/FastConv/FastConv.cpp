@@ -18,7 +18,7 @@ Error_t CFastConv::init(float *pfImpulseResponse, int iLengthOfIr, int iBlockLen
 
     m_ConvType = eCompMode;
     m_pfImpulseResponse = new float [iLengthOfIr];
-    m_pfTail = new float [iLengthOfIr-1];
+
     m_pfInputTail = new float[(2 * iLengthOfIr) - 1];
     m_pfBlockBuffer = new float[iBlockLength];
 
@@ -36,26 +36,28 @@ Error_t CFastConv::init(float *pfImpulseResponse, int iLengthOfIr, int iBlockLen
         m_pfImpulseResponse[i] = pfImpulseResponse[i];
     }
 
+    m_bLongBlock = false;
     return Error_t::kNoError;
 }
 
 Error_t CFastConv::reset()
 {
     delete[] m_pfImpulseResponse;
-    delete[] m_pfTail;
     delete[] m_pfInputTail;
     delete[] m_pfBlockBuffer;
 
-    m_pCFftInstance->resetInstance();
-    CFft::destroyInstance(m_pCFftInstance);
+    m_bLongBlock = false;
 
+    if (m_ConvType == CFastConv::ConvCompMode_t::kFreqDomain)
+    {
+        m_pCFftInstance->resetInstance();
+        CFft::destroyInstance(m_pCFftInstance);
+    }
     return Error_t::kNoError;
 }
 
 Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, int iLengthOfBuffers )
 {
-    if (m_iblockSize > iLengthOfBuffers) m_bLongBlock = true;
-
     if (m_iLengthOfIr < iLengthOfBuffers)
     {
         m_iTailIndex = iLengthOfBuffers - m_iLengthOfIr + 1;
@@ -87,6 +89,8 @@ Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, i
     }
     else if (m_ConvType == CFastConv::ConvCompMode_t::kFreqDomain)
     {
+        m_bLongBlock = (m_iblockSize > iLengthOfBuffers) ? true : false;
+
         int fftBlockSize = 2 * m_iblockSize;
 
         m_pfFreqInput = new CFft::complex_t[fftBlockSize];
@@ -111,7 +115,7 @@ Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, i
         }
 
         int nBlockInput = 0;
-        while ((nBlockInput < (iLengthOfBuffers / m_iblockSize)) || (nBlockInput == 0 && (iLengthOfBuffers / m_iblockSize) == 0))
+        while ((static_cast<float>(nBlockInput) < (static_cast<float>(iLengthOfBuffers) / static_cast<float>(m_iblockSize))) || (nBlockInput == 0 ))
         {
             for (int i = m_iblockSize * nBlockInput; i < m_iblockSize * (nBlockInput + 2); i++)
             {
@@ -119,7 +123,7 @@ Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, i
                 else m_pfTimeInput[i] = (i < m_iblockSize * (nBlockInput + 1) && i < iLengthOfBuffers) ? pfInputBuffer[i] : 0;
             }
             int nBlockIr = 0;
-            while ((nBlockIr < (m_iLengthOfIr / m_iblockSize)) || (nBlockIr == 0 && (iLengthOfBuffers / m_iblockSize) == 0))
+            while ((static_cast<float>(nBlockIr) < (static_cast<float>(m_iLengthOfIr) / static_cast<float>(m_iblockSize))) || (nBlockIr == 0 ))
             {
                 for (int i = m_iblockSize * nBlockIr; i < m_iblockSize * (nBlockIr + 2); i++)
                 {
