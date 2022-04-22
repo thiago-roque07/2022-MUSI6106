@@ -162,13 +162,13 @@ namespace fastconv_test {
 
         int blockSizes[8] = { 1, 13, 1023, 2048, 1, 17, 5000, 1897};
 
-        m_pCFastConv->init(m_Ir,m_IrLength,256,CFastConv::kFreqDomain);
+        m_pCFastConv->init(m_Ir,m_IrLength,1024,CFastConv::kFreqDomain);
 
         for (int i = 0; i < 3; i++)
         {
             m_pCFastConv->process(pfOutput, pfInput, blockSizes[i]);
             if (blockSizes[i] < 3) CHECK_ARRAY_CLOSE(pfInput, pfOutput, 3, 1e-3);
-            else CHECK_ARRAY_CLOSE(m_Ir, pfOutput + 3, 7, 1e-3);
+            else CHECK_ARRAY_CLOSE(m_Ir, pfOutput + 3, 7, 1e-2);
             CVector::setZero(pfOutput, 10000);
         }
 
