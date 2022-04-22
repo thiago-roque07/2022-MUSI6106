@@ -87,21 +87,23 @@ Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, i
     }
     else if (m_ConvType == CFastConv::ConvCompMode_t::kFreqDomain)
     {
-        m_pfFreqInput = new CFft::complex_t[2 * m_iblockSize];
-        m_pfFreqIr = new CFft::complex_t[2 * m_iblockSize];
-        m_pfFreqConv = new CFft::complex_t[2 * m_iblockSize];
+        int fftBlockSize = 2 * m_iblockSize;
 
-        m_pfTimeInput = new float[2 * m_iblockSize];
-        m_pfTimeIr = new float[2 * m_iblockSize];
+        m_pfFreqInput = new CFft::complex_t[fftBlockSize];
+        m_pfFreqIr = new CFft::complex_t[fftBlockSize];
+        m_pfFreqConv = new CFft::complex_t[fftBlockSize];
 
-        m_pfRealInput = new float[2 * m_iblockSize];
-        m_pfImagInput = new float[2 * m_iblockSize];
-        m_pfRealIr = new float[2 * m_iblockSize];
-        m_pfImagIr = new float[2 * m_iblockSize];
-        m_pfRealConv = new float[2 * m_iblockSize];
-        m_pfImagConv = new float[2 * m_iblockSize];
+        m_pfTimeInput = new float[fftBlockSize];
+        m_pfTimeIr = new float[fftBlockSize];
 
-        m_pfTmpConv = new float[2 * m_iblockSize];
+        m_pfRealInput = new float[fftBlockSize];
+        m_pfImagInput = new float[fftBlockSize];
+        m_pfRealIr = new float[fftBlockSize];
+        m_pfImagIr = new float[fftBlockSize];
+        m_pfRealConv = new float[fftBlockSize];
+        m_pfImagConv = new float[fftBlockSize];
+
+        m_pfTmpConv = new float[fftBlockSize];
 
         for (int i = 0; i < iLengthOfBuffers; i++) 
         {
@@ -127,15 +129,15 @@ Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, i
                 m_pCFftInstance->doFft(m_pfFreqInput, m_pfTimeInput);
                 m_pCFftInstance->doFft(m_pfFreqIr, m_pfTimeIr);
 
-                for (int i = 0; i < 2 * m_iblockSize; i++)
+                for (int i = 0; i < fftBlockSize; i++)
                 {
-                    m_pfFreqInput[i] *= 2 * m_iblockSize;
-                    m_pfFreqIr[i] *= 2 * m_iblockSize;
+                    m_pfFreqInput[i] *= fftBlockSize;
+                    m_pfFreqIr[i] *= fftBlockSize;
                 }
                 m_pCFftInstance->splitRealImag(m_pfRealInput, m_pfImagInput, m_pfFreqInput);
                 m_pCFftInstance->splitRealImag(m_pfRealIr, m_pfImagIr, m_pfFreqIr);
 
-                for (int i = 0; i < (2 * m_iblockSize); i++)
+                for (int i = 0; i < (fftBlockSize); i++)
                 {
                     m_pfRealConv[i] = (m_pfRealInput[i] * m_pfRealIr[i]) - (m_pfImagInput[i] * m_pfImagIr[i]);
                     m_pfImagConv[i] = (m_pfRealInput[i] * m_pfImagIr[i]) + (m_pfImagInput[i] * m_pfRealIr[i]);
@@ -147,14 +149,14 @@ Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, i
                 {
                     for (int i = 0; i < iLengthOfBuffers; i++)
                     {
-                        pfOutputBuffer[i] += (m_pfTmpConv[i] * (1.0f/ (2 * m_iblockSize)));
+                        pfOutputBuffer[i] += (m_pfTmpConv[i] * (1.0f/ (fftBlockSize)));
                     }
                 }
                 else
                 {
                     for (int i = m_iblockSize * (nBlockIr + nBlockInput); i < m_iblockSize * (nBlockIr + nBlockInput + 2); i++)
                     {
-                        pfOutputBuffer[i] += (m_pfTmpConv[i] * (1.0f / (2 * m_iblockSize)));
+                        pfOutputBuffer[i] += (m_pfTmpConv[i] * (1.0f / (fftBlockSize)));
                     }
                 }
                 nBlockIr++;
@@ -177,12 +179,9 @@ Error_t CFastConv::process (float* pfOutputBuffer, const float *pfInputBuffer, i
         delete[] m_pfImagConv;
         delete[] m_pfTmpConv;
 
-
         return Error_t::kNoError;
     }
     else return Error_t::kFunctionInvalidArgsError;
-
-
 }
 
 Error_t CFastConv::flushBuffer(float* pfOutputBuffer)
