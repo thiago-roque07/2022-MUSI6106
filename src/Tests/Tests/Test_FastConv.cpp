@@ -10,6 +10,7 @@
 
 #include "gtest/gtest.h"
 
+#include <chrono>
 
 namespace fastconv_test {
     void CHECK_ARRAY_CLOSE(float* buffer1, float* buffer2, int iLength, float fTolerance)
@@ -36,10 +37,8 @@ namespace fastconv_test {
             {
                 if (i < m_ImpulseLength) { m_Impulse[i] = 0; };
                 m_Ir[i] = (rand() / static_cast<float>(RAND_MAX));
-                // m_Ir[i] = 10;
             }
             m_Impulse[3] = 1;
-            //m_Impulse[1] = 1;
 
         }
 
@@ -47,6 +46,7 @@ namespace fastconv_test {
         {
             delete[] m_Ir;
             delete[] m_Impulse;
+            //delete[] m_pCFastConv;
         }
 
         CFastConv *m_pCFastConv = 0;
@@ -62,13 +62,18 @@ namespace fastconv_test {
         float *pfOutput = new float[m_ImpulseLength];
         CVector::setZero(pfOutput, m_ImpulseLength);
 
+        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+
         m_pCFastConv->init(m_Ir,m_IrLength,m_IrLength,CFastConv::kTimeDomain);
         m_pCFastConv->process(pfOutput, m_Impulse, m_ImpulseLength);
 
-        CHECK_ARRAY_CLOSE(m_Ir, pfOutput+3, 7, 1e-3);
-
-        delete[] pfOutput;
         m_pCFastConv->reset();
+
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        std::cout << "Identity Test for time domain = " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << " us" << std::endl;
+
+        CHECK_ARRAY_CLOSE(m_Ir, pfOutput + 3, 7, 1e-3);
+        delete[] pfOutput;
     }
 
     TEST_F(FastConv, FlushBuffer_TD)
@@ -124,13 +129,20 @@ namespace fastconv_test {
         float *pfOutput = new float[m_ImpulseLength];
         CVector::setZero(pfOutput, 10);
 
+        std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+
         m_pCFastConv->init(m_Ir,m_IrLength,256,CFastConv::kFreqDomain);
         m_pCFastConv->process(pfOutput, m_Impulse, 10);
+
+        m_pCFastConv->reset();
+
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        std::cout << "Identity Test for frequency domain = " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << " us" << std::endl;
 
         CHECK_ARRAY_CLOSE(m_Ir, pfOutput+3, 7, 1e-3);
 
         delete[] pfOutput;
-        m_pCFastConv->reset();
+
     }
 
     TEST_F(FastConv, FlushBuffer_FD)
@@ -157,8 +169,6 @@ namespace fastconv_test {
         float *pfOutput = new float[10000];
         CVector::setZero(pfOutput, 10000);
 
-        //float* pfTail = new float[m_IrLength - 1];
-        //CVector::setZero(pfTail, m_IrLength - 1);
 
         int blockSizes[8] = { 1, 13, 1023, 2048, 1, 17, 5000, 1897};
 
@@ -174,7 +184,7 @@ namespace fastconv_test {
 
         delete[] pfInput;
         delete[] pfOutput;
-        //delete[] pfTail;
+
         m_pCFastConv->reset();
     }
 }
