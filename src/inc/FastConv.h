@@ -46,13 +46,6 @@ public:
 
 
 private:
-    //int m_iLengthOfIr = 0;
-    //int m_iblockSize = 0;
-    //int m_iTailIndex = 0;
-
-    //float* m_pfImpulseResponse;
-    //float* m_pfInputTail;
-    //float* m_pfBlockBuffer;
 };
 
 class CFftConv : public CBaseConv
@@ -66,14 +59,6 @@ public:
     Error_t processConv(float* pfOutputBuffer, const float* pfInputBuffer, int iLengthOfBuffers) override;
 
 private:
-
-    //int m_iLengthOfIr = 0;
-    //int m_iblockSize = 0;
-    //int m_iTailIndex = 0;
-
-    //float* m_pfImpulseResponse;
-    //float* m_pfInputTail;
-    //float* m_pfBlockBuffer;
 
     float* m_pfTimeInput;
     float* m_pfTimeIr;

@@ -36,8 +36,8 @@ namespace fastconv_test {
             for (int i = 0; i < m_IrLength; i++)
             {
                 if (i < m_PulseLength) { m_Pulse[i] = 0; };
-                //m_Ir[i] = (rand() / static_cast<float>(RAND_MAX));
-                m_Ir[i] = i;
+                m_Ir[i] = (rand() / static_cast<float>(RAND_MAX));
+                //m_Ir[i] = i;
             }
             m_Pulse[3] = 1;
 
@@ -113,10 +113,15 @@ namespace fastconv_test {
 
         for (int i = 0; i < 8; i++)
         {
+            std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
             m_pCFastConv->process(pfOutput, pfInput, blockSizes[i]);
             if (blockSizes[i] < 3) CHECK_ARRAY_CLOSE(pfInput, pfOutput, 3, 1e-3);
             else CHECK_ARRAY_CLOSE(m_Ir, pfOutput + 3, 7, 1e-3);
             CVector::setZero(pfOutput, 10000);
+
+            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+            std::cout << "Block Size Test for time domain = " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << " us" << std::endl;
+
         }
 
         delete[] pfInput;
@@ -133,7 +138,7 @@ namespace fastconv_test {
 
         std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
-        m_pCFastConv->init(m_Ir,m_IrLength, 1024,CFastConv::kFreqDomain);
+        m_pCFastConv->init(m_Ir,m_IrLength, 256,CFastConv::kFreqDomain);
 
         m_pCFastConv->process(pfOutput, m_Pulse, 10);
 
@@ -175,14 +180,20 @@ namespace fastconv_test {
 
         int blockSizes[8] = { 1, 13, 1023, 2048, 1, 17, 5000, 1897};
 
-        m_pCFastConv->init(m_Ir,m_IrLength,1024,CFastConv::kFreqDomain);
+        m_pCFastConv->init(m_Ir,m_IrLength, 256,CFastConv::kFreqDomain);
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 8; i++)
         {
+            std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+
             m_pCFastConv->process(pfOutput, pfInput, blockSizes[i]);
             if (blockSizes[i] < 3) CHECK_ARRAY_CLOSE(pfInput, pfOutput, 3, 1e-3);
             else CHECK_ARRAY_CLOSE(m_Ir, pfOutput + 3, 7, 1e-2);
             CVector::setZero(pfOutput, 10000);
+
+            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+            std::cout << "Block Size Test for frequency domain = " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << " us" << std::endl;
+
         }
 
         delete[] pfInput;

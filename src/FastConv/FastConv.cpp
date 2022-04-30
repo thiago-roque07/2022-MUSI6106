@@ -91,8 +91,11 @@ Error_t CTimeConv::initConv(float* pfImpulseResponse, int iLengthOfIr, int iBloc
 Error_t CTimeConv::resetConv()
 {
     delete[] m_pfImpulseResponse;
+    m_pfImpulseResponse = 0;
     delete[] m_pfInputTail;
+    m_pfInputTail = 0;
     delete[] m_pfBlockBuffer;
+    m_pfBlockBuffer = 0;
 
     return Error_t::kNoError;
 }
@@ -190,8 +193,11 @@ Error_t CFftConv::initConv(float* pfImpulseResponse, int iLengthOfIr, int iBlock
 Error_t CFftConv::resetConv()
 {
     delete[] m_pfImpulseResponse;
+    m_pfImpulseResponse = 0;
     delete[] m_pfInputTail;
+    m_pfInputTail = 0;
     delete[] m_pfBlockBuffer;
+    m_pfBlockBuffer = 0;
 
     m_bLongBlock = false;
 
@@ -249,26 +255,23 @@ Error_t CFftConv::processConv(float* pfOutputBuffer, const float* pfInputBuffer,
     {
         for (int i = m_iblockSize * nBlockInput; i < m_iblockSize * (nBlockInput + 2); i++)
         {
-            if (nBlockInput == 0) m_pfTimeInput[i] = (i < m_iblockSize || (i - m_iblockSize) > iLengthOfBuffers - 1) ? 0 : pfInputBuffer[i - m_iblockSize];
-            else m_pfTimeInput[i] = (i < m_iblockSize* (nBlockInput + 1) && i < iLengthOfBuffers) ? pfInputBuffer[i] : 0;
+            if (nBlockInput == 0) m_pfTimeInput[i] = (i < m_iblockSize || (i - m_iblockSize) > iLengthOfBuffers - 1) ? 0 : pfInputBuffer[i - m_iblockSize] * fftBlockSize;
+            else m_pfTimeInput[i - m_iblockSize * nBlockInput] = (i < m_iblockSize* (nBlockInput + 1) && i < iLengthOfBuffers) ? pfInputBuffer[i] * fftBlockSize : 0;
         }
+        m_pCFftInstance->doFft(m_pfFreqInput, m_pfTimeInput);
+        m_pCFftInstance->splitRealImag(m_pfRealInput, m_pfImagInput, m_pfFreqInput);
+
+
         int nBlockIr = 0;
         while ((static_cast<float>(nBlockIr) < (static_cast<float>(m_iLengthOfIr) / static_cast<float>(m_iblockSize))) || (nBlockIr == 0))
         {
             for (int i = m_iblockSize * nBlockIr; i < m_iblockSize * (nBlockIr + 2); i++)
             {
-                if (nBlockIr == 0) m_pfTimeIr[i] = (i < m_iblockSize || (i - m_iblockSize) > m_iLengthOfIr - 1) ? 0 : m_pfImpulseResponse[i - m_iblockSize];
-                else m_pfTimeIr[i] = (i < m_iblockSize* (nBlockIr + 1) && i < m_iLengthOfIr) ? m_pfImpulseResponse[i] : 0;
+                if (nBlockIr == 0) m_pfTimeIr[i] = (i < m_iblockSize || (i - m_iblockSize) > m_iLengthOfIr - 1) ? 0 : m_pfImpulseResponse[i - m_iblockSize] * fftBlockSize;
+                else m_pfTimeIr[i - m_iblockSize * nBlockIr] = (i < m_iblockSize* (nBlockIr + 1) && i < m_iLengthOfIr) ? m_pfImpulseResponse[i] * fftBlockSize : 0;
             }
-            m_pCFftInstance->doFft(m_pfFreqInput, m_pfTimeInput);
-            m_pCFftInstance->doFft(m_pfFreqIr, m_pfTimeIr);
 
-            for (int i = 0; i < fftBlockSize; i++)
-            {
-                m_pfFreqInput[i] *= fftBlockSize;
-                m_pfFreqIr[i] *= fftBlockSize;
-            }
-            m_pCFftInstance->splitRealImag(m_pfRealInput, m_pfImagInput, m_pfFreqInput);
+            m_pCFftInstance->doFft(m_pfFreqIr, m_pfTimeIr);
             m_pCFftInstance->splitRealImag(m_pfRealIr, m_pfImagIr, m_pfFreqIr);
 
             for (int i = 0; i < (fftBlockSize); i++)
@@ -298,34 +301,33 @@ Error_t CFftConv::processConv(float* pfOutputBuffer, const float* pfInputBuffer,
         nBlockInput++;
     }
     delete[] m_pfFreqInput;
+    m_pfFreqInput = 0;
     delete[] m_pfFreqIr;
+    m_pfFreqIr = 0;
     delete[] m_pfFreqConv;
+    m_pfFreqConv = 0;
+
 
     delete[] m_pfTimeInput;
+    m_pfTimeInput = 0;
     delete[] m_pfTimeIr;
+    m_pfTimeIr = 0;
 
     delete[] m_pfRealInput;
+    m_pfRealInput = 0;
     delete[] m_pfImagInput;
+    m_pfImagInput = 0;
     delete[] m_pfRealIr;
+    m_pfRealIr = 0;
     delete[] m_pfImagIr;
+    m_pfImagIr = 0;
     delete[] m_pfRealConv;
+    m_pfRealConv = 0;
     delete[] m_pfImagConv;
+    m_pfImagConv = 0;
     delete[] m_pfTmpConv;
+    m_pfTmpConv = 0;
 
     return Error_t::kNoError;
 }
 
-///*
-// * Flush Buffer to output the tail of the convolution for the FFT Convolution Class
-// */
-//Error_t CFftConv::flushBufferConv(float* pfOutputBuffer)
-//{
-//    for (int i = m_iTailIndex; i < m_iTailIndex + m_iLengthOfIr - 1; i++) {
-//        pfOutputBuffer[i - m_iTailIndex] = 0;
-//        for (int j = 0; j < m_iLengthOfIr; j++) {
-//            if (i - j < 0) break;
-//            pfOutputBuffer[i - m_iTailIndex] += m_pfInputTail[i - j] * m_pfImpulseResponse[j];
-//        }
-//    }
-//    return Error_t::kNoError;
-//}
