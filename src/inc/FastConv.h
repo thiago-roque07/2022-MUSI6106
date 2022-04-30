@@ -6,6 +6,97 @@
 
 #include "ErrorDef.h"
 #include "Fft.h"
+#include <iostream>
+
+
+
+class CBaseConv
+{
+public:
+    CBaseConv() {};
+    virtual ~CBaseConv(void) {};
+
+    virtual Error_t initConv(float* pfImpulseResponse, int iLengthOfIr, int iBlockLength) = 0;
+    virtual Error_t resetConv() = 0;
+    virtual Error_t processConv(float* pfOutputBuffer, const float* pfInputBuffer, int iLengthOfBuffers) = 0;
+    Error_t flushBufferConv(float* pfOutputBuffer);
+
+protected:
+
+    int m_iLengthOfIr = 0;
+    int m_iblockSize = 0;
+    int m_iTailIndex = 0;
+
+    float* m_pfImpulseResponse;
+    float* m_pfInputTail;
+    float* m_pfBlockBuffer;
+};
+
+
+
+class CTimeConv : public CBaseConv
+{
+public:
+    CTimeConv();
+    ~CTimeConv();
+
+    Error_t initConv(float* pfImpulseResponse, int iLengthOfIr, int iBlockLength) override;
+    Error_t resetConv() override;
+    Error_t processConv(float* pfOutputBuffer, const float* pfInputBuffer, int iLengthOfBuffers) override;
+
+
+private:
+    //int m_iLengthOfIr = 0;
+    //int m_iblockSize = 0;
+    //int m_iTailIndex = 0;
+
+    //float* m_pfImpulseResponse;
+    //float* m_pfInputTail;
+    //float* m_pfBlockBuffer;
+};
+
+class CFftConv : public CBaseConv
+{
+public:
+    CFftConv();
+    ~CFftConv();
+
+    Error_t initConv(float* pfImpulseResponse, int iLengthOfIr, int iBlockLength) override;
+    Error_t resetConv() override;
+    Error_t processConv(float* pfOutputBuffer, const float* pfInputBuffer, int iLengthOfBuffers) override;
+
+private:
+
+    //int m_iLengthOfIr = 0;
+    //int m_iblockSize = 0;
+    //int m_iTailIndex = 0;
+
+    //float* m_pfImpulseResponse;
+    //float* m_pfInputTail;
+    //float* m_pfBlockBuffer;
+
+    float* m_pfTimeInput;
+    float* m_pfTimeIr;
+    float* m_pfTmpConv;
+
+
+    CFft::complex_t* m_pfFreqInput;
+    CFft::complex_t* m_pfFreqIr;
+    CFft::complex_t* m_pfFreqConv;
+    float* m_pfRealInput;
+    float* m_pfImagInput;
+    float* m_pfRealIr;
+    float* m_pfImagIr;
+    float* m_pfRealConv;
+    float* m_pfImagConv;
+    float* m_pfTimeConv;
+
+    CFft* m_pCFftInstance;
+
+    bool m_bLongBlock = false;
+};
+
+
 
 /*! \brief interface for fast convolution
 */
@@ -20,8 +111,8 @@ public:
         kNumConvCompModes
     };
 
-    CFastConv(void);
-    virtual ~CFastConv(void);
+    CFastConv();
+    ~CFastConv();
 
     /*! initializes the class with the impulse response and the block length
     \param pfImpulseResponse impulse response samples (mono only)
@@ -30,7 +121,6 @@ public:
     \return Error_t
     */
     Error_t init(float* pfImpulseResponse, int iLengthOfIr, int iBlockLength = 8192, ConvCompMode_t eCompMode = kFreqDomain);
-
     /*! resets all internal class members
     \return Error_t
     */
@@ -52,34 +142,7 @@ public:
 
 private:
     ConvCompMode_t m_ConvType;
-    int m_iLengthOfIr = 0;
-    int m_iblockSize = 0;
-    int m_iTailIndex = 0;
-
-    float* m_pfBlockBuffer;
-    float* m_pfImpulseResponse;
-    float *m_pfTimeInput;
-    float *m_pfTimeIr;
-    float *m_pfTmpConv;
-    float *m_pfInputTail;
-    CFft::complex_t *m_pfFreqInput;
-    CFft::complex_t *m_pfFreqIr;
-    CFft::complex_t *m_pfFreqConv;
-    float *m_pfRealInput;
-    float *m_pfImagInput;
-    float *m_pfRealIr;
-    float *m_pfImagIr;
-    float *m_pfRealConv;
-    float *m_pfImagConv;
-    float *m_pfTimeConv;
-
-    float* m_pfTestTime;
-    float* m_pfTestIr;
-
-    int m_iFftLength;
-
-    bool m_bLongBlock = false;
-    CFft* m_pCFftInstance;
+    CBaseConv* m_pCConv;
 };
 
 
